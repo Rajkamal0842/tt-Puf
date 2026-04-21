@@ -71,5 +71,6 @@
 
   "//": "Only export pin area in LEF (without any connected nets)",
 "MAGIC_WRITE_LEF_PINONLY": 1,
+    "RUN_LINTER": 0,
     "SYNTH_GOLDBEAT_LOOP_IGNORE": true
 }
