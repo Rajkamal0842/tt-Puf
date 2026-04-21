@@ -1,24 +1,3 @@
-# Tiny Tapeout project information
-project: 
-  title:        "16-Element RO-PUF"
-  author:       "Rajkamal, Raj Kumar, Harish Naidu"
-  discord:      ""      
-  description:  "A Hardware Security Primtive using Ring Oscillator"
-  language:     "Verilog" 
-  clock_hz:     50000000     
-  
-  # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
-
-  # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_puf"
-
-  # List your project's source files here.
-  # Source files must be in ./src and you must list each source file separately, one per line.
-  # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
- # List your project's source files here.
-# Source files must be in ./src and you must list each source file separately, one per line.
-source_files:
 project:
   title:        "16-Element RO-PUF"
   author:       "Rajkamal, Raj Kumar, Harish Naidu"
@@ -29,33 +8,32 @@ project:
   source_files:
     - "project.v"
 
-# The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
+# How many tiles your design occupies? A single tile is about 167x108 uM.
+tiles: "1x1"
+
+# Your top module name
+top_module:  "tt_um_puf"
+
+# Pinout configuration
 pinout:
+  ui[0]: "RO_A Sel 0"
+  ui[1]: "RO_A Sel 1"
+  ui[2]: "RO_A Sel 2"
+  ui[3]: "RO_A Sel 3"
+  ui[4]: "RO_B Sel 0"
+  ui[5]: "RO_B Sel 1"
+  ui[6]: "RO_B Sel 2"
+  ui[7]: "RO_B Sel 3"
 
-# The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
-# This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
-pinout:
-  # Inputs
-  ui[0]: "Challenge Bit 0 (RO_A Sel)"
-  ui[1]: "Challenge Bit 1 (RO_A Sel)"
-  ui[2]: "Challenge Bit 2 (RO_A Sel)"
-  ui[3]: "Challenge Bit 3 (RO_A Sel)"
-  ui[4]: "Challenge Bit 4 (RO_B Sel)"
-  ui[5]: "Challenge Bit 5 (RO_B Sel)"
-  ui[6]: "Challenge Bit 6 (RO_B Sel)"
-  ui[7]: "Challenge Bit 7 (RO_B Sel)"
+  uo[0]: "Response"
+  uo[1]: "Done"
+  uo[2]: "Debug 0"
+  uo[3]: "Debug 1"
+  uo[4]: "Debug 2"
+  uo[5]: "Debug 3"
+  uo[6]: "Debug 4"
+  uo[7]: "Debug 5"
 
-  # Outputs
-  uo[0]: "PUF Response (1-bit)"
-  uo[1]: "Done Flag"
-  uo[2]: "Debug Bit 0"
-  uo[3]: "Debug Bit 1"
-  uo[4]: "Debug Bit 2"
-  uo[5]: "Debug Bit 3"
-  uo[6]: "Debug Bit 4"
-  uo[7]: "Debug Bit 5x"
-
-  # Bidirectional pins
   uio[0]: "Unused"
   uio[1]: "Unused"
   uio[2]: "Unused"
@@ -63,7 +41,6 @@ pinout:
   uio[4]: "Unused"
   uio[5]: "Unused"
   uio[6]: "Unused"
-  uio[7]: ""
+  uio[7]: "Unused"
 
-# Do not change!
 yaml_version: 6
