@@ -1,23 +1,4 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 17.04.2026 10:11:52
-// Design Name: 
-// Module Name: Puf
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
+`default_nettype none
 `timescale 1ns / 1ps
 
 module ro_cell (
@@ -40,8 +21,6 @@ module ro_cell (
     assign o_osc_out = w_stage_5_inv;
 
 endmodule
-
-`timescale 1ns / 1ps
 
 module Puf (
     input  wire       i_clk,
@@ -165,7 +144,6 @@ module Puf (
     end
 
 endmodule
-`default_nettype none
 
 module tt_um_puf (
     input  wire [7:0] ui_in,    
