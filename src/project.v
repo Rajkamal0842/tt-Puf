@@ -165,3 +165,29 @@ module Puf (
     end
 
 endmodule
+`default_nettype none
+
+module tt_um_puf (
+    input  wire [7:0] ui_in,    
+    output wire [7:0] uo_out,   
+    input  wire [7:0] uio_in,   
+    output wire [7:0] uio_out,  
+    output wire [7:0] uio_oe,   
+    input  wire       ena,      
+    input  wire       clk,      
+    input  wire       rst_n     
+);
+
+    assign uio_out = 8'b00000000;
+    assign uio_oe  = 8'b00000000;
+
+    Puf core_puf_inst (
+        .i_clk       (clk),
+        .i_rst_n     (rst_n),
+        .i_challenge (ui_in),        
+        .o_response  (uo_out[0]),    
+        .o_done      (uo_out[1]),    
+        .o_debug     (uo_out[7:2])   
+    );
+
+endmodule
