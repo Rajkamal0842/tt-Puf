@@ -74,5 +74,7 @@
     "RUN_LINTER": 0,
     "QUIT_ON_LINTER_ERRORS": false,
     "QUIT_ON_SYNTH_CHECKS": false,
+    "QUIT_ON_MAGIC_DRC": false,
+    "QUIT_ON_TIMING_VIOLATIONS": false,
     "SYNTH_GOLDBEAT_LOOP_IGNORE": true
 }
