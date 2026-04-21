@@ -1,6 +1,7 @@
 `default_nettype none
 `timescale 1ns / 1ps
 
+// verilator lint_off UNOPTFLAT
 module ro_cell (
     input  wire i_enable,
     output wire o_osc_out
