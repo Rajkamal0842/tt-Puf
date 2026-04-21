@@ -70,6 +70,6 @@
   "MAGIC_DEF_LABELS": 0,
 
   "//": "Only export pin area in LEF (without any connected nets)",
- "MAGIC_WRITE_LEF_PINONLY": 1,
+"MAGIC_WRITE_LEF_PINONLY": 1,
     "SYNTH_GOLDBEAT_LOOP_IGNORE": true
 }
