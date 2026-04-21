@@ -19,7 +19,15 @@ project:
  # List your project's source files here.
 # Source files must be in ./src and you must list each source file separately, one per line.
 source_files:
-  - "project.v"
+project:
+  title:        "16-Element RO-PUF"
+  author:       "Rajkamal, Raj Kumar, Harish Naidu"
+  discord:      ""
+  description:  "A Hardware Security Primitive using Ring Oscillators"
+  language:     "Verilog"
+  clock_hz:     50000000
+  source_files:
+    - "project.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
