@@ -48,50 +48,45 @@ module tt_um_puf (
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro14 <= 1'b0; else if (ro_en) ro14 <= ~ro14; end
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro15 <= 1'b1; else if (ro_en) ro15 <= ~ro15; end
 
-    reg sig_a_r;
-    reg sig_b_r;
+    // MUX A — combinational, initialised to ro0 first to avoid LATCH warning
+    wire sig_a_w;
+    wire sig_b_w;
 
-    always @(*) begin
-        case (ui_in[3:0])
-            4'd0:    sig_a_r = ro0;
-            4'd1:    sig_a_r = ro1;
-            4'd2:    sig_a_r = ro2;
-            4'd3:    sig_a_r = ro3;
-            4'd4:    sig_a_r = ro4;
-            4'd5:    sig_a_r = ro5;
-            4'd6:    sig_a_r = ro6;
-            4'd7:    sig_a_r = ro7;
-            4'd8:    sig_a_r = ro8;
-            4'd9:    sig_a_r = ro9;
-            4'd10:   sig_a_r = ro10;
-            4'd11:   sig_a_r = ro11;
-            4'd12:   sig_a_r = ro12;
-            4'd13:   sig_a_r = ro13;
-            4'd14:   sig_a_r = ro14;
-            default: sig_a_r = ro15;
-        endcase
-    end
+    assign sig_a_w =
+        (ui_in[3:0] == 4'd1)  ? ro1  :
+        (ui_in[3:0] == 4'd2)  ? ro2  :
+        (ui_in[3:0] == 4'd3)  ? ro3  :
+        (ui_in[3:0] == 4'd4)  ? ro4  :
+        (ui_in[3:0] == 4'd5)  ? ro5  :
+        (ui_in[3:0] == 4'd6)  ? ro6  :
+        (ui_in[3:0] == 4'd7)  ? ro7  :
+        (ui_in[3:0] == 4'd8)  ? ro8  :
+        (ui_in[3:0] == 4'd9)  ? ro9  :
+        (ui_in[3:0] == 4'd10) ? ro10 :
+        (ui_in[3:0] == 4'd11) ? ro11 :
+        (ui_in[3:0] == 4'd12) ? ro12 :
+        (ui_in[3:0] == 4'd13) ? ro13 :
+        (ui_in[3:0] == 4'd14) ? ro14 :
+        (ui_in[3:0] == 4'd15) ? ro15 :
+        ro0;
 
-    always @(*) begin
-        case (ui_in[7:4])
-            4'd0:    sig_b_r = ro0;
-            4'd1:    sig_b_r = ro1;
-            4'd2:    sig_b_r = ro2;
-            4'd3:    sig_b_r = ro3;
-            4'd4:    sig_b_r = ro4;
-            4'd5:    sig_b_r = ro5;
-            4'd6:    sig_b_r = ro6;
-            4'd7:    sig_b_r = ro7;
-            4'd8:    sig_b_r = ro8;
-            4'd9:    sig_b_r = ro9;
-            4'd10:   sig_b_r = ro10;
-            4'd11:   sig_b_r = ro11;
-            4'd12:   sig_b_r = ro12;
-            4'd13:   sig_b_r = ro13;
-            4'd14:   sig_b_r = ro14;
-            default: sig_b_r = ro15;
-        endcase
-    end
+    assign sig_b_w =
+        (ui_in[7:4] == 4'd1)  ? ro1  :
+        (ui_in[7:4] == 4'd2)  ? ro2  :
+        (ui_in[7:4] == 4'd3)  ? ro3  :
+        (ui_in[7:4] == 4'd4)  ? ro4  :
+        (ui_in[7:4] == 4'd5)  ? ro5  :
+        (ui_in[7:4] == 4'd6)  ? ro6  :
+        (ui_in[7:4] == 4'd7)  ? ro7  :
+        (ui_in[7:4] == 4'd8)  ? ro8  :
+        (ui_in[7:4] == 4'd9)  ? ro9  :
+        (ui_in[7:4] == 4'd10) ? ro10 :
+        (ui_in[7:4] == 4'd11) ? ro11 :
+        (ui_in[7:4] == 4'd12) ? ro12 :
+        (ui_in[7:4] == 4'd13) ? ro13 :
+        (ui_in[7:4] == 4'd14) ? ro14 :
+        (ui_in[7:4] == 4'd15) ? ro15 :
+        ro0;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -119,10 +114,10 @@ module tt_um_puf (
                     end
                 end
                 S_EVAL: begin
-                    if (sig_a_r & ~prev_a) counter_a <= counter_a + 8'd1;
-                    if (sig_b_r & ~prev_b) counter_b <= counter_b + 8'd1;
-                    prev_a   <= sig_a_r;
-                    prev_b   <= sig_b_r;
+                    if (sig_a_w & ~prev_a) counter_a <= counter_a + 8'd1;
+                    if (sig_b_w & ~prev_b) counter_b <= counter_b + 8'd1;
+                    prev_a   <= sig_a_w;
+                    prev_b   <= sig_b_w;
                     eval_cnt <= eval_cnt + 8'd1;
                     if (eval_cnt == 8'd199) state <= S_DONE;
                 end
