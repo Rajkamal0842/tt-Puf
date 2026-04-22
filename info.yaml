@@ -1,21 +1,25 @@
 project:
-  title: "PUF Design"
-  author: "Raj Kamal"
-  description: "Simple Arbiter PUF design"
+  title: "PUF Ring Oscillator"
+  author: "Rajkamal"
+  description: "Simple PUF using two ring oscillators and XOR output"
   language: "Verilog"
+  clock_hz: 0
   tiles: "1x1"
+  top_module: "tt_um_puf"
+  source_files:
+    - "src/tt_um_puf.v"
 
 pinout:
-  ui[0]: "challenge_bit0"
-  ui[1]: "challenge_bit1"
-  ui[2]: "challenge_bit2"
-  ui[3]: "challenge_bit3"
-  ui[4]: "challenge_bit4"
-  ui[5]: "challenge_bit5"
-  ui[6]: "challenge_bit6"
-  ui[7]: "challenge_bit7"
+  ui[0]: "unused"
+  ui[1]: "unused"
+  ui[2]: "unused"
+  ui[3]: "unused"
+  ui[4]: "unused"
+  ui[5]: "unused"
+  ui[6]: "unused"
+  ui[7]: "unused"
 
-  uo[0]: "response_bit0"
+  uo[0]: "PUF output"
   uo[1]: "unused"
   uo[2]: "unused"
   uo[3]: "unused"
@@ -24,7 +28,7 @@ pinout:
   uo[6]: "unused"
   uo[7]: "unused"
 
-  uio[0]: "unused"
+  uio[0]: "enable input"
   uio[1]: "unused"
   uio[2]: "unused"
   uio[3]: "unused"
