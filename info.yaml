@@ -6,14 +6,14 @@ project:
   how_to_test: "Enable the PUF using uio[0] and observe the oscillating response on uo[0]."
   language: "Verilog"
   clock_hz: 50000000
-  tiles: "1x1"          # <--- Missing Key 1
-  yaml_version: 6        # <--- Missing Key 2
+  tiles: "1x1"
+  yaml_version: 6
 
   source_files:
     - "project.v"
   top_module: "tt_um_puf"
 
-  pinout:                # <--- Missing Key 3
+  pinout:
     ui[0]: "Unused"
     ui[1]: "Unused"
     ui[2]: "Unused"
