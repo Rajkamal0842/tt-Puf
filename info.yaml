@@ -1,42 +1,44 @@
 yaml_version: 6
 
 project:
-  title: "Differential RO-PUF"
-  description: "A Hardware Security Primitive using Ring Oscillators."
-  author: "RAJKAMAL NEMALIPURI"
-  how_it_works: "Two identical ring oscillators are XORed to create a unique bit."
-  how_to_test: "Enable the PUF using uio[0] and observe uo[0]."
+  title: "PUF Design"
+  author: "Raj Kamal"
+  description: "Arbiter PUF implementation"
   language: "Verilog"
-  clock_hz: 50000000
-  tiles: "1x1"
+  clock_hz: 10000000
 
-source_files:
-  - "project.v"
-
-top_module: "tt_um_puf"
+  top_module: "top"        # your main module name
+  source_files:
+    - "top.v"              # your Verilog files
+    - "puf.v"
 
 pinout:
-  ui[0]: "unused"
-  ui[1]: "unused"
-  ui[2]: "unused"
-  ui[3]: "unused"
-  ui[4]: "unused"
-  ui[5]: "unused"
-  ui[6]: "unused"
-  ui[7]: "unused"
-  uo[0]: "puf_out"
-  uo[1]: "unused"
-  uo[2]: "unused"
-  uo[3]: "unused"
-  uo[4]: "unused"
-  uo[5]: "unused"
-  uo[6]: "unused"
-  uo[7]: "unused"
-  uio[0]: "puf_en"
-  uio[1]: "unused"
-  uio[2]: "unused"
-  uio[3]: "unused"
-  uio[4]: "unused"
-  uio[5]: "unused"
-  uio[6]: "unused"
-  uio[7]: "unused"
+  ui:
+    - in0
+    - in1
+    - in2
+    - in3
+    - in4
+    - in5
+    - in6
+    - in7
+
+  uo:
+    - out0
+    - out1
+    - out2
+    - out3
+    - out4
+    - out5
+    - out6
+    - out7
+
+  uio:
+    - io0
+    - io1
+    - io2
+    - io3
+    - io4
+    - io5
+    - io6
+    - io7
