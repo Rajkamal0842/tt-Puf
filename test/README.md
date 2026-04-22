@@ -1,47 +1,50 @@
-# Sample testbench for a Tiny Tapeout project
+# Ring Oscillator PUF — Tiny Tapeout
 
-This is a sample testbench for a Tiny Tapeout project. It uses [cocotb](https://docs.cocotb.org/en/stable/) to drive the DUT and check the outputs.
-See below to get started or for more information, check the [website](https://tinytapeout.com/hdl/testing/).
+A hardware security primitive: **Ring Oscillator Physical Unclonable Function (RO-PUF)** on sky130.
 
-## Setting up
+## What it does
 
-1. Edit [Makefile](Makefile) and modify `PROJECT_SOURCES` to point to your Verilog files.
-2. Edit [tb.v](tb.v) and replace `tt_um_example` with your module name.
+Applies an 8-bit challenge (`ui_in`) to select two of 16 on-chip ring oscillators, races them for 200 clock cycles, and returns a 1-bit response based on which runs faster. Because oscillator frequencies are set by silicon manufacturing variation, the response is unique to each die.
 
-## How to run
+| Pin | Direction | Function |
+|-----|-----------|----------|
+| `ui_in[3:0]` | Input | Select RO_A (0–15) |
+| `ui_in[7:4]` | Input | Select RO_B (0–15) |
+| `uo_out[0]`  | Output | PUF response bit |
+| `uo_out[1]`  | Output | Done / result-valid flag |
+| `uo_out[7:2]`| Output | Counter A bits 7:2 (debug) |
+| `uio_*`      | —     | Unused (tied to 0) |
 
-To run the RTL simulation:
+## How to use
 
-```sh
-make -B
+1. Clock: 50 MHz
+2. Assert `rst_n` low then high
+3. Set `ui_in` to your challenge
+4. Wait for `uo_out[1]` to pulse high (~200 cycles / ~4 µs)
+5. Read response from `uo_out[0]`
+6. Change challenge to trigger a new evaluation
+
+## Simulation
+
+```bash
+cd test
+make        # RTL sim
+make GATES=yes  # Gate-level sim (requires PDK_ROOT)
 ```
 
-To run gatelevel simulation, first harden your project and copy `../runs/wokwi/results/final/verilog/gl/{your_module_name}.v` to `gate_level_netlist.v`.
+## Project structure
 
-Then run:
-
-```sh
-make -B GATES=yes
 ```
-
-If you wish to save the waveform in VCD format instead of FST format, edit tb.v to use `$dumpfile("tb.vcd");` and then run:
-
-```sh
-make -B FST=
-```
-
-This will generate `tb.vcd` instead of `tb.fst`.
-
-## How to view the waveform file
-
-Using GTKWave
-
-```sh
-gtkwave tb.fst tb.gtkw
-```
-
-Using Surfer
-
-```sh
-surfer tb.fst
+├── src/
+│   └── tt_um_puf.v       ← entire design, single file
+├── test/
+│   ├── Makefile
+│   ├── tb.v
+│   ├── test.py
+│   ├── tb.gtkw
+│   ├── requirements.txt
+│   └── results.xml
+├── docs/
+│   └── info.md
+└── info.yaml
 ```
