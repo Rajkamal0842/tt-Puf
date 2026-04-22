@@ -1,41 +1,5 @@
 project:
-  title:        "16-Element RO-PUF"
-  author:       "Rajkamal, Raj Kumar, Harish Naidu"
-  discord:      ""
-  description:  "A Hardware Security Primitive using Ring Oscillators"
-  language:     "Verilog"
-  clock_hz:     50000000
-  source_files:
-    - "project.v"
-  tiles: "1x1"
-  top_module: "tt_um_puf"
-
-pinout:
-  ui[0]: "RO_A Sel 0"
-  ui[1]: "RO_A Sel 1"
-  ui[2]: "RO_A Sel 2"
-  ui[3]: "RO_A Sel 3"
-  ui[4]: "RO_B Sel 0"
-  ui[5]: "RO_B Sel 1"
-  ui[6]: "RO_B Sel 2"
-  ui[7]: "RO_B Sel 3"
-
-  uo[0]: "Response"
-  uo[1]: "Done"
-  uo[2]: "Debug 0"
-  uo[3]: "Debug 1"
-  uo[4]: "Debug 2"
-  uo[5]: "Debug 3"
-  uo[6]: "Debug 4"
-  uo[7]: "Debug 5"
-
-  uio[0]: "Unused"
-  uio[1]: "Unused"
-  uio[2]: "Unused"
-  uio[3]: "Unused"
-  uio[4]: "Unused"
-  uio[5]: "Unused"
-  uio[6]: "Unused"
-  uio[7]: "Unused"
-
-yaml_version: 6
+  title: "Differential RO-PUF Security Core"
+  description: "A Hardware Security Primitive using phase comparison of Ring Oscillators."
+  author: "RAJKAMAL NEMALIPURI"
+  module_name: "tt_um_puf_rajkamal"
