@@ -7,12 +7,9 @@
     "QUIT_ON_SYNTH_CHECKS": false,
     "QUIT_ON_MAGIC_DRC": false,
     "QUIT_ON_TIMING_VIOLATIONS": false,
-    "QUIT_ON_HOLD_VIOLATIONS": false,
-    "QUIT_ON_SETUP_VIOLATIONS": false,
     "SYNTH_GOLDBEAT_LOOP_IGNORE": true,
     "SYNTH_BUFFERING": 0,
     "SYNTH_SIZING": 0,
     "FP_SIZING": "absolute",
-    "DIE_AREA": "0 0 161.0 111.52",
-    "MAGIC_WRITE_LEF_PINONLY": 1
+    "DIE_AREA": "0 0 161.0 111.52"
 }
