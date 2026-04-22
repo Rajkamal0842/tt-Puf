@@ -1,6 +1,6 @@
 `default_nettype none
 
-module tt_um_puf_rajkamal (
+module tt_um_puf (
     input  wire [7:0] ui_in,    // Challenge bits (not used in simple RO, but required for top)
     output wire [7:0] uo_out,   // Response bit on uo_out[0]
     input  wire [7:0] uio_in,   // uio_in[0] is the Enable signal
