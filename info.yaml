@@ -3,7 +3,7 @@ yaml_version: 6
 project:
   title:       "Ring Oscillator PUF"
   author:      "Rajkamal"
-  description: "Hardware security primitive: 16 ring oscillators compared over a 200-cycle window to produce a 1-bit challenge–response PUF."
+  description: "Hardware security primitive: 16 ring oscillators compared over a 200-cycle window to produce a 1-bit challenge-response PUF."
   language:    "Verilog"
   clock_hz:    50000000
   tiles:       "1x1"
