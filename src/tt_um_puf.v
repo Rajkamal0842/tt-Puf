@@ -20,13 +20,6 @@ module tt_um_puf (
     wire [3:0] sel_a = ui_in[3:0];
     wire [3:0] sel_b = ui_in[7:4];
 
-    // ----------------------------------------------------------------
-    // RO bank — 16 independent toggle flip-flops gated by ro_en.
-    // Each bit is a separate always block: no for-loop, no integer.
-    // (* keep *) prevents Yosys from merging/optimising them away.
-    // In silicon, distinct placement of each FF produces unique
-    // routing delays — that variation IS the PUF entropy.
-    // ----------------------------------------------------------------
     wire ro_en;
 
     (* keep = "true" *) reg ro0,  ro1,  ro2,  ro3;
@@ -51,16 +44,12 @@ module tt_um_puf (
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro14 <= 1'b0; else if (ro_en) ro14 <= ~ro14; end
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro15 <= 1'b1; else if (ro_en) ro15 <= ~ro15; end
 
-    // Collect into a bus for the MUX
     wire [15:0] ro_bus = {ro15,ro14,ro13,ro12,ro11,ro10,ro9,ro8,
                           ro7, ro6, ro5, ro4, ro3, ro2, ro1, ro0};
 
     wire sig_a = ro_bus[sel_a];
     wire sig_b = ro_bus[sel_b];
 
-    // ----------------------------------------------------------------
-    // FSM
-    // ----------------------------------------------------------------
     localparam S_IDLE = 2'd0;
     localparam S_EVAL = 2'd1;
     localparam S_DONE = 2'd2;
