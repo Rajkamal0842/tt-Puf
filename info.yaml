@@ -8,9 +8,11 @@ project:
   clock_hz: 50000000
   tiles: "1x1"
   yaml_version: 6
+
   source_files:
     - "project.v"
   top_module: "tt_um_puf"
+
   pinout:
     ui[0]: "Unused"
     ui[1]: "Unused"
