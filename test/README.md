@@ -13,7 +13,7 @@ Applies an 8-bit challenge (`ui_in`) to select two of 16 on-chip ring oscillator
 | `uo_out[0]`  | Output | PUF response bit |
 | `uo_out[1]`  | Output | Done / result-valid flag |
 | `uo_out[7:2]`| Output | Counter A bits 7:2 (debug) |
-| `uio_*`      | —     | Unused (tied to 0) |
+| `uio_*`      | —      | Unused (tied to 0) |
 
 ## How to use
 
@@ -28,8 +28,8 @@ Applies an 8-bit challenge (`ui_in`) to select two of 16 on-chip ring oscillator
 
 ```bash
 cd test
-make        # RTL sim
-make GATES=yes  # Gate-level sim (requires PDK_ROOT)
+make                # RTL sim
+make GATES=yes      # Gate-level sim (requires PDK_ROOT)
 ```
 
 ## Project structure
