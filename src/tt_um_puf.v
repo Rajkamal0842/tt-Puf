@@ -11,12 +11,9 @@ module tt_um_puf (
     input  wire       rst_n
 );
 
-    wire [3:0] sel_a = ui_in[3:0];
-    wire [3:0] sel_b = ui_in[7:4];
-
-    localparam S_IDLE = 2'd0;
-    localparam S_EVAL = 2'd1;
-    localparam S_DONE = 2'd2;
+    localparam [1:0] S_IDLE = 2'd0;
+    localparam [1:0] S_EVAL = 2'd1;
+    localparam [1:0] S_DONE = 2'd2;
 
     reg [1:0] state;
     reg [7:0] eval_cnt;
@@ -25,11 +22,14 @@ module tt_um_puf (
     reg       response;
     reg       done;
     reg [7:0] challenge_prev;
-
-    wire ro_en = (state == S_EVAL);
+    reg       prev_a;
+    reg       prev_b;
 
     reg ro0,  ro1,  ro2,  ro3,  ro4,  ro5,  ro6,  ro7;
     reg ro8,  ro9,  ro10, ro11, ro12, ro13, ro14, ro15;
+
+    wire ro_en;
+    assign ro_en = (state == S_EVAL) ? 1'b1 : 1'b0;
 
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro0  <= 1'b0; else if (ro_en) ro0  <= ~ro0;  end
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro1  <= 1'b1; else if (ro_en) ro1  <= ~ro1;  end
@@ -48,14 +48,50 @@ module tt_um_puf (
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro14 <= 1'b0; else if (ro_en) ro14 <= ~ro14; end
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro15 <= 1'b1; else if (ro_en) ro15 <= ~ro15; end
 
-    wire [15:0] ro_bus;
-    assign ro_bus = {ro15,ro14,ro13,ro12,ro11,ro10,ro9,ro8,
-                     ro7, ro6, ro5, ro4, ro3, ro2, ro1, ro0};
+    reg sig_a_r;
+    reg sig_b_r;
 
-    wire sig_a = ro_bus[sel_a];
-    wire sig_b = ro_bus[sel_b];
+    always @(*) begin
+        case (ui_in[3:0])
+            4'd0:    sig_a_r = ro0;
+            4'd1:    sig_a_r = ro1;
+            4'd2:    sig_a_r = ro2;
+            4'd3:    sig_a_r = ro3;
+            4'd4:    sig_a_r = ro4;
+            4'd5:    sig_a_r = ro5;
+            4'd6:    sig_a_r = ro6;
+            4'd7:    sig_a_r = ro7;
+            4'd8:    sig_a_r = ro8;
+            4'd9:    sig_a_r = ro9;
+            4'd10:   sig_a_r = ro10;
+            4'd11:   sig_a_r = ro11;
+            4'd12:   sig_a_r = ro12;
+            4'd13:   sig_a_r = ro13;
+            4'd14:   sig_a_r = ro14;
+            default: sig_a_r = ro15;
+        endcase
+    end
 
-    reg prev_a, prev_b;
+    always @(*) begin
+        case (ui_in[7:4])
+            4'd0:    sig_b_r = ro0;
+            4'd1:    sig_b_r = ro1;
+            4'd2:    sig_b_r = ro2;
+            4'd3:    sig_b_r = ro3;
+            4'd4:    sig_b_r = ro4;
+            4'd5:    sig_b_r = ro5;
+            4'd6:    sig_b_r = ro6;
+            4'd7:    sig_b_r = ro7;
+            4'd8:    sig_b_r = ro8;
+            4'd9:    sig_b_r = ro9;
+            4'd10:   sig_b_r = ro10;
+            4'd11:   sig_b_r = ro11;
+            4'd12:   sig_b_r = ro12;
+            4'd13:   sig_b_r = ro13;
+            4'd14:   sig_b_r = ro14;
+            default: sig_b_r = ro15;
+        endcase
+    end
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -83,10 +119,10 @@ module tt_um_puf (
                     end
                 end
                 S_EVAL: begin
-                    if (sig_a & ~prev_a) counter_a <= counter_a + 8'd1;
-                    if (sig_b & ~prev_b) counter_b <= counter_b + 8'd1;
-                    prev_a   <= sig_a;
-                    prev_b   <= sig_b;
+                    if (sig_a_r & ~prev_a) counter_a <= counter_a + 8'd1;
+                    if (sig_b_r & ~prev_b) counter_b <= counter_b + 8'd1;
+                    prev_a   <= sig_a_r;
+                    prev_b   <= sig_b_r;
                     eval_cnt <= eval_cnt + 8'd1;
                     if (eval_cnt == 8'd199) state <= S_DONE;
                 end
@@ -103,8 +139,8 @@ module tt_um_puf (
     assign uo_out[0]   = response;
     assign uo_out[1]   = done;
     assign uo_out[7:2] = counter_a[7:2];
-    assign uio_out = 8'b0;
-    assign uio_oe  = 8'b0;
+    assign uio_out     = 8'b0;
+    assign uio_oe      = 8'b0;
 
     wire _unused = &{ena, uio_in, 1'b0};
 
