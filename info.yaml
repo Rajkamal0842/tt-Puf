@@ -1,41 +1,43 @@
+yaml_version: 6
+
 project:
-  title: "PUF Ring Oscillator"
-  author: "Rajkamal"
-  description: "Simple PUF using two ring oscillators and XOR output"
-  language: "Verilog"
-  clock_hz: 0
-  tiles: "1x1"
-  top_module: "tt_um_puf"
+  title:       "Ring Oscillator PUF"
+  author:      "Rajkamal"
+  description: "Hardware security primitive: 16 ring oscillators compared over a 200-cycle window to produce a 1-bit challenge–response PUF."
+  language:    "Verilog"
+  clock_hz:    50000000
+  tiles:       "1x1"
+  top_module:  "tt_um_puf"
   source_files:
-    - "src/tt_um_puf.v"
+    - tt_um_puf.v
 
 pinout:
-  ui:
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
+  ui[0]: "RO_A select bit 0"
+  ui[1]: "RO_A select bit 1"
+  ui[2]: "RO_A select bit 2"
+  ui[3]: "RO_A select bit 3"
+  ui[4]: "RO_B select bit 0"
+  ui[5]: "RO_B select bit 1"
+  ui[6]: "RO_B select bit 2"
+  ui[7]: "RO_B select bit 3"
+  uo[0]: "PUF response bit"
+  uo[1]: "Done / result-valid flag"
+  uo[2]: "Counter A bit 2 (debug)"
+  uo[3]: "Counter A bit 3 (debug)"
+  uo[4]: "Counter A bit 4 (debug)"
+  uo[5]: "Counter A bit 5 (debug)"
+  uo[6]: "Counter A bit 6 (debug)"
+  uo[7]: "Counter A bit 7 (debug)"
+  uio[0]: ""
+  uio[1]: ""
+  uio[2]: ""
+  uio[3]: ""
+  uio[4]: ""
+  uio[5]: ""
+  uio[6]: ""
+  uio[7]: ""
 
-  uo:
-    - "PUF output"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-
-  uio:
-    - "enable input"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
-    - "unused"
+tags:
+  - security
+  - puf
+  - ring-oscillator
