@@ -3,88 +3,71 @@ from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, RisingEdge
 
 
-# ---------------------------------------------------------------------------
-# Helper: wait for the done pulse (uo_out[1]) with a timeout
-# ---------------------------------------------------------------------------
-async def wait_for_done(dut, timeout_cycles=500):
+async def wait_for_done(dut, timeout_cycles=400):
+    """Wait for uo_out[1] (done flag) to go high. Returns True if seen."""
     for _ in range(timeout_cycles):
         await RisingEdge(dut.clk)
-        if int(dut.uo_out.value) & 0x02:   # bit 1 = done
+        if int(dut.uo_out.value) & 0x02:
             return True
     return False
 
 
 # ---------------------------------------------------------------------------
-# Test 1 – smoke test: design runs without crashing (RTL + GL compatible)
+# Test 1 – smoke: design runs 300 cycles without crashing (RTL + GL)
 # ---------------------------------------------------------------------------
 @cocotb.test()
 async def test_puf_smoke(dut):
-    """Smoke test: verifies the design starts up and completes one evaluation."""
-
-    clock = Clock(dut.clk, 20, units="ns")   # 50 MHz
+    """Smoke test: design initialises and runs without errors."""
+    clock = Clock(dut.clk, 20, unit="ns")   # 50 MHz
     cocotb.start_soon(clock.start())
 
     dut.ui_in.value  = 0
     dut.uio_in.value = 0
     dut.ena.value    = 1
 
-    # Reset
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    # Apply a non-trivial challenge (RO_A = 3, RO_B = 7)
-    dut.ui_in.value = (7 << 4) | 3
-
-    # Run long enough for one 200-cycle evaluation
     await ClockCycles(dut.clk, 300)
 
     dut._log.info(
-        f"SMOKE PASSED — uo_out=0x{int(dut.uo_out.value):02X} "
-        f"uio_out=0x{int(dut.uio_out.value):02X} "
-        f"uio_oe=0x{int(dut.uio_oe.value):02X}"
+        f"SMOKE PASSED — uo_out=0x{int(dut.uo_out.value):02X}"
     )
 
 
 # ---------------------------------------------------------------------------
-# Test 2 – done flag: verify uo_out[1] pulses after evaluation window
+# Test 2 – done flag asserts within 250 cycles after reset
 # ---------------------------------------------------------------------------
 @cocotb.test()
 async def test_puf_done_flag(dut):
-    """Verifies the done flag asserts within 250 cycles of a new challenge."""
-
-    clock = Clock(dut.clk, 20, units="ns")
+    """Done flag (uo_out[1]) must pulse within 250 cycles of reset release."""
+    clock = Clock(dut.clk, 20, unit="ns")
     cocotb.start_soon(clock.start())
 
-    dut.ui_in.value  = 0
+    dut.ui_in.value  = 0x1E   # RO_A=14, RO_B=1 — different oscillators
     dut.uio_in.value = 0
     dut.ena.value    = 1
 
+    # Reset — FSM inits challenge_prev=0xFF so any challenge triggers immediately
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    # Challenge: RO_A = 1, RO_B = 14 → clearly different oscillators
-    dut.ui_in.value = (14 << 4) | 1
-
-    done = await wait_for_done(dut, timeout_cycles=300)
-
-    assert done, "Done flag (uo_out[1]) never asserted within 300 cycles!"
+    done = await wait_for_done(dut, timeout_cycles=250)
+    assert done, "Done flag (uo_out[1]) never asserted within 250 cycles!"
 
     response = int(dut.uo_out.value) & 0x01
-    dut._log.info(f"DONE FLAG PASSED — PUF response bit = {response}")
+    dut._log.info(f"DONE FLAG PASSED — response={response}")
 
 
 # ---------------------------------------------------------------------------
-# Test 3 – challenge sensitivity: different challenges → results captured
+# Test 3 – multiple challenges each produce a done pulse
 # ---------------------------------------------------------------------------
 @cocotb.test()
 async def test_puf_multiple_challenges(dut):
-    """Applies several challenges and logs responses (no strict assertion –
-    in RTL sim all ROs are identical so responses may be 0; the test just
-    confirms the FSM cycles correctly for each challenge change)."""
-
-    clock = Clock(dut.clk, 20, units="ns")
+    """Each new challenge must trigger the FSM and assert done."""
+    clock = Clock(dut.clk, 20, unit="ns")
     cocotb.start_soon(clock.start())
 
     dut.ui_in.value  = 0
@@ -95,28 +78,19 @@ async def test_puf_multiple_challenges(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    challenges = [
-        (0,  1),
-        (2,  5),
-        (7,  12),
-        (15, 0),
-        (3,  3),   # same RO → expect 0
-    ]
+    # First evaluation fires automatically after reset (challenge_prev = 0xFF)
+    done = await wait_for_done(dut, timeout_cycles=250)
+    assert done, "Done flag never asserted after reset!"
+    dut._log.info(f"Challenge 0x{int(dut.ui_in.value):02X} -> response={int(dut.uo_out.value)&1}")
 
-    for sel_a, sel_b in challenges:
-        challenge = (sel_b << 4) | sel_a
-        dut.ui_in.value = challenge
-
-        done = await wait_for_done(dut, timeout_cycles=300)
-        assert done, f"Done flag never asserted for challenge A={sel_a} B={sel_b}"
-
+    # Now cycle through explicit challenges
+    challenges = [0x12, 0x57, 0xAB, 0xF0, 0x33]
+    for ch in challenges:
+        await ClockCycles(dut.clk, 5)   # short gap between challenges
+        dut.ui_in.value = ch
+        done = await wait_for_done(dut, timeout_cycles=250)
+        assert done, f"Done flag never asserted for challenge 0x{ch:02X}!"
         response = int(dut.uo_out.value) & 0x01
-        dut._log.info(
-            f"Challenge A={sel_a:2d} B={sel_b:2d} "
-            f"(0x{challenge:02X}) → response={response}"
-        )
-
-        # Small gap between challenges so FSM sees the change
-        await ClockCycles(dut.clk, 5)
+        dut._log.info(f"Challenge 0x{ch:02X} -> response={response}")
 
     dut._log.info("MULTIPLE CHALLENGES PASSED")
