@@ -2,8 +2,8 @@ project:
   title: "Differential RO-PUF"
   description: "A Hardware Security Primitive using Ring Oscillators."
   author: "RAJKAMAL NEMALIPURI"
-  how_it_works: "Two ring oscillators are XORed to create a unique bit."
-  how_to_test: "Enable using uio[0] and observe uo[0]."
+  how_it_works: "Two identical ring oscillators are XORed to create a unique bit."
+  how_to_test: "Enable the PUF using uio[0] and observe uo[0]."
   language: "Verilog"
   clock_hz: 50000000
   tiles: "1x1"
