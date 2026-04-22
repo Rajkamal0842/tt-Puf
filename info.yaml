@@ -1,5 +1,5 @@
 project:
-  title: "Differential RO PUF"
+  title: "Differential RO-PUF"
   description: "A Hardware Security Primitive using Ring Oscillators."
   author: "RAJKAMAL NEMALIPURI"
   how_it_works: "Two identical ring oscillators are XORed to create a unique bit."
