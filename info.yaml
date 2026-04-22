@@ -1,4 +1,4 @@
-yaml_version: 6
+yaml_version: 5
 
 project:
   title: "Differential RO-PUF"
