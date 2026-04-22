@@ -1,44 +1,34 @@
-yaml_version: 6
-
 project:
   title: "PUF Design"
   author: "Raj Kamal"
-  description: "Arbiter PUF implementation"
+  description: "Simple Arbiter PUF design"
   language: "Verilog"
-  clock_hz: 10000000
-
-  top_module: "top"        # your main module name
-  source_files:
-    - "top.v"              # your Verilog files
-    - "puf.v"
+  tiles: "1x1"
 
 pinout:
-  ui:
-    - in0
-    - in1
-    - in2
-    - in3
-    - in4
-    - in5
-    - in6
-    - in7
+  ui[0]: "challenge_bit0"
+  ui[1]: "challenge_bit1"
+  ui[2]: "challenge_bit2"
+  ui[3]: "challenge_bit3"
+  ui[4]: "challenge_bit4"
+  ui[5]: "challenge_bit5"
+  ui[6]: "challenge_bit6"
+  ui[7]: "challenge_bit7"
 
-  uo:
-    - out0
-    - out1
-    - out2
-    - out3
-    - out4
-    - out5
-    - out6
-    - out7
+  uo[0]: "response_bit0"
+  uo[1]: "unused"
+  uo[2]: "unused"
+  uo[3]: "unused"
+  uo[4]: "unused"
+  uo[5]: "unused"
+  uo[6]: "unused"
+  uo[7]: "unused"
 
-  uio:
-    - io0
-    - io1
-    - io2
-    - io3
-    - io4
-    - io5
-    - io6
-    - io7
+  uio[0]: "unused"
+  uio[1]: "unused"
+  uio[2]: "unused"
+  uio[3]: "unused"
+  uio[4]: "unused"
+  uio[5]: "unused"
+  uio[6]: "unused"
+  uio[7]: "unused"
