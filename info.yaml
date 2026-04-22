@@ -1,18 +1,19 @@
 project:
-  title: "Differential RO-PUF Security Core"
-  description: "A Hardware Security Primitive using phase comparison of Ring Oscillators to generate unique silicon signatures."
+  title: "Differential RO-PUF"
+  description: "A Hardware Security Primitive using phase comparison of Ring Oscillators."
   author: "RAJKAMAL NEMALIPURI"
   how_it_works: "Two identical ring oscillators are XORed. Process variation causes tiny frequency differences, creating a unique bit."
   how_to_test: "Enable the PUF using uio[0] and observe the oscillating response on uo[0]."
   language: "Verilog"
   clock_hz: 50000000
-  device: "sky130"
-  
+  tiles: "1x1"          # <--- Missing Key 1
+  yaml_version: 6        # <--- Missing Key 2
+
   source_files:
     - "project.v"
-  top_module: "tt_um_puf_rajkamal"
+  top_module: "tt_um_puf"
 
-  pinout:
+  pinout:                # <--- Missing Key 3
     ui[0]: "Unused"
     ui[1]: "Unused"
     ui[2]: "Unused"
