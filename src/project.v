@@ -1,20 +1,20 @@
 `default_nettype none
 
 module tt_um_puf (
-    input  wire [7:0] ui_in,    // Challenge bits (not used in simple RO)
-    output wire [7:0] uo_out,   // Response bit on uo_out[0]
-    input  wire [7:0] uio_in,   // uio_in[0] is the Enable signal
-    output wire [7:0] uio_out,  // Not used
-    output wire [7:0] uio_oe,   // Not used
-    input  wire       ena,      // Power enable
-    input  wire       clk,      // System clock
-    input  wire       rst_n     // Reset
+    input  wire [7:0] ui_in,    // Dedicated inputs
+    output wire [7:0] uo_out,   // Dedicated outputs
+    input  wire [7:0] uio_in,   // IOs: Input path
+    output wire [7:0] uio_out,  // IOs: Output path
+    output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
+    input  wire       ena,      // always 1 when the design is powered
+    input  wire       clk,      // clock
+    input  wire       rst_n     // reset_n - low to reset
 );
 
-    // PUF Enable signal from first bidirectional pin
+    // Use uio_in[0] as the Enable signal for the PUF
     wire en = uio_in[0];
 
-    // RING OSCILLATOR 1 (Upper Branch)
+    // Ring Oscillator 1
     (* keep = "true" *) wire [4:0] ro1;
     assign ro1[0] = ~(en & ro1[4]);
     assign ro1[1] = ~ro1[0];
@@ -22,7 +22,7 @@ module tt_um_puf (
     assign ro1[3] = ~ro1[2];
     assign ro1[4] = ~ro1[3];
 
-    // RING OSCILLATOR 2 (Lower Branch)
+    // Ring Oscillator 2
     (* keep = "true" *) wire [4:0] ro2;
     assign ro2[0] = ~(en & ro2[4]);
     assign ro2[1] = ~ro2[0];
@@ -30,13 +30,11 @@ module tt_um_puf (
     assign ro2[3] = ~ro2[2];
     assign ro2[4] = ~ro2[3];
 
-    // XOR comparison creates a unique phase-beat frequency
+    // XOR the outputs to create the PUF response
     wire puf_core = ro1[4] ^ ro2[4];
 
-    // Assign result to the first output pin
-    assign uo_out = {7'b0, puf_core};
-    
-    // Set all other outputs/enables to zero
+    // Output mapping
+    assign uo_out = {7'b0, puf_core}; // Result on uo_out[0]
     assign uio_out = 8'b0;
     assign uio_oe  = 8'b0;
 
