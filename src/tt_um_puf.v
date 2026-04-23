@@ -1,5 +1,11 @@
 `default_nettype none
 
+// Ring Oscillator PUF - Tiny Tapeout (sky130)
+//
+// Each RO bit is an independent always block — no for-loop, no integer
+// variable — so Yosys synthesis checks pass cleanly.
+// challenge_prev inits to 0xFF so challenge 0x00 triggers on first cycle.
+
 module tt_um_puf (
     input  wire [7:0] ui_in,
     output wire [7:0] uo_out,
@@ -11,25 +17,22 @@ module tt_um_puf (
     input  wire       rst_n
 );
 
-    localparam [1:0] S_IDLE = 2'd0;
-    localparam [1:0] S_EVAL = 2'd1;
-    localparam [1:0] S_DONE = 2'd2;
+    wire [3:0] sel_a = ui_in[3:0];
+    wire [3:0] sel_b = ui_in[7:4];
 
-    reg [1:0] state;
-    reg [7:0] eval_cnt;
-    reg [7:0] counter_a;
-    reg [7:0] counter_b;
-    reg       response;
-    reg       done;
-    reg [7:0] challenge_prev;
-    reg       prev_a;
-    reg       prev_b;
-
-    reg ro0,  ro1,  ro2,  ro3,  ro4,  ro5,  ro6,  ro7;
-    reg ro8,  ro9,  ro10, ro11, ro12, ro13, ro14, ro15;
-
+    // ----------------------------------------------------------------
+    // RO bank — 16 independent toggle flip-flops gated by ro_en.
+    // Each bit is a separate always block: no for-loop, no integer.
+    // (* keep *) prevents Yosys from merging/optimising them away.
+    // In silicon, distinct placement of each FF produces unique
+    // routing delays — that variation IS the PUF entropy.
+    // ----------------------------------------------------------------
     wire ro_en;
-    assign ro_en = (state == S_EVAL) ? 1'b1 : 1'b0;
+
+    (* keep = "true" *) reg ro0,  ro1,  ro2,  ro3;
+    (* keep = "true" *) reg ro4,  ro5,  ro6,  ro7;
+    (* keep = "true" *) reg ro8,  ro9,  ro10, ro11;
+    (* keep = "true" *) reg ro12, ro13, ro14, ro15;
 
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro0  <= 1'b0; else if (ro_en) ro0  <= ~ro0;  end
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro1  <= 1'b1; else if (ro_en) ro1  <= ~ro1;  end
@@ -48,45 +51,30 @@ module tt_um_puf (
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro14 <= 1'b0; else if (ro_en) ro14 <= ~ro14; end
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro15 <= 1'b1; else if (ro_en) ro15 <= ~ro15; end
 
-    // MUX A — combinational, initialised to ro0 first to avoid LATCH warning
-    wire sig_a_w;
-    wire sig_b_w;
+    // Collect into a bus for the MUX
+    wire [15:0] ro_bus = {ro15,ro14,ro13,ro12,ro11,ro10,ro9,ro8,
+                          ro7, ro6, ro5, ro4, ro3, ro2, ro1, ro0};
 
-    assign sig_a_w =
-        (ui_in[3:0] == 4'd1)  ? ro1  :
-        (ui_in[3:0] == 4'd2)  ? ro2  :
-        (ui_in[3:0] == 4'd3)  ? ro3  :
-        (ui_in[3:0] == 4'd4)  ? ro4  :
-        (ui_in[3:0] == 4'd5)  ? ro5  :
-        (ui_in[3:0] == 4'd6)  ? ro6  :
-        (ui_in[3:0] == 4'd7)  ? ro7  :
-        (ui_in[3:0] == 4'd8)  ? ro8  :
-        (ui_in[3:0] == 4'd9)  ? ro9  :
-        (ui_in[3:0] == 4'd10) ? ro10 :
-        (ui_in[3:0] == 4'd11) ? ro11 :
-        (ui_in[3:0] == 4'd12) ? ro12 :
-        (ui_in[3:0] == 4'd13) ? ro13 :
-        (ui_in[3:0] == 4'd14) ? ro14 :
-        (ui_in[3:0] == 4'd15) ? ro15 :
-        ro0;
+    wire sig_a = ro_bus[sel_a];
+    wire sig_b = ro_bus[sel_b];
 
-    assign sig_b_w =
-        (ui_in[7:4] == 4'd1)  ? ro1  :
-        (ui_in[7:4] == 4'd2)  ? ro2  :
-        (ui_in[7:4] == 4'd3)  ? ro3  :
-        (ui_in[7:4] == 4'd4)  ? ro4  :
-        (ui_in[7:4] == 4'd5)  ? ro5  :
-        (ui_in[7:4] == 4'd6)  ? ro6  :
-        (ui_in[7:4] == 4'd7)  ? ro7  :
-        (ui_in[7:4] == 4'd8)  ? ro8  :
-        (ui_in[7:4] == 4'd9)  ? ro9  :
-        (ui_in[7:4] == 4'd10) ? ro10 :
-        (ui_in[7:4] == 4'd11) ? ro11 :
-        (ui_in[7:4] == 4'd12) ? ro12 :
-        (ui_in[7:4] == 4'd13) ? ro13 :
-        (ui_in[7:4] == 4'd14) ? ro14 :
-        (ui_in[7:4] == 4'd15) ? ro15 :
-        ro0;
+    // ----------------------------------------------------------------
+    // FSM
+    // ----------------------------------------------------------------
+    localparam S_IDLE = 2'd0;
+    localparam S_EVAL = 2'd1;
+    localparam S_DONE = 2'd2;
+
+    reg [1:0]  state;
+    reg [7:0]  eval_cnt;
+    reg [7:0]  counter_a;
+    reg [7:0]  counter_b;
+    reg        response;
+    reg        done;
+    reg [7:0]  challenge_prev;
+    reg        prev_a, prev_b;
+
+    assign ro_en = (state == S_EVAL);
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -114,10 +102,10 @@ module tt_um_puf (
                     end
                 end
                 S_EVAL: begin
-                    if (sig_a_w & ~prev_a) counter_a <= counter_a + 8'd1;
-                    if (sig_b_w & ~prev_b) counter_b <= counter_b + 8'd1;
-                    prev_a   <= sig_a_w;
-                    prev_b   <= sig_b_w;
+                    if (sig_a & ~prev_a) counter_a <= counter_a + 8'd1;
+                    if (sig_b & ~prev_b) counter_b <= counter_b + 8'd1;
+                    prev_a   <= sig_a;
+                    prev_b   <= sig_b;
                     eval_cnt <= eval_cnt + 8'd1;
                     if (eval_cnt == 8'd199) state <= S_DONE;
                 end
@@ -134,8 +122,8 @@ module tt_um_puf (
     assign uo_out[0]   = response;
     assign uo_out[1]   = done;
     assign uo_out[7:2] = counter_a[7:2];
-    assign uio_out     = 8'b0;
-    assign uio_oe      = 8'b0;
+    assign uio_out = 8'b0;
+    assign uio_oe  = 8'b0;
 
     wire _unused = &{ena, uio_in, 1'b0};
 
