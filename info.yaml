@@ -1,12 +1,11 @@
 ---
 project:
-  title:        "Ring Oscillator PUF"
-  author:       "Rajkamal0842"
-  discord:      ""
-  description:  "Ring Oscillator PUF - selects two of 16 ring oscillators and compares frequencies to produce a unique 1-bit response per die"
-  language:     "Verilog"
-  clock_hz:     50000000
-
+  title: "Ring Oscillator PUF"
+  author: "Rajkamal0842"
+  discord: ""
+  description: "Ring Oscillator PUF - selects two of 16 ring oscillators and compares frequencies to produce a unique 1-bit response per die"
+  language: "Verilog"
+  clock_hz: 50000000
   inputs:
     - RO_A select bit 0
     - RO_A select bit 1
@@ -16,7 +15,6 @@ project:
     - RO_B select bit 1
     - RO_B select bit 2
     - RO_B select bit 3
-
   outputs:
     - PUF response bit
     - Done flag
@@ -26,7 +24,6 @@ project:
     - Counter A bit 5 (debug)
     - Counter A bit 6 (debug)
     - Counter A bit 7 (debug)
-
   bidirectional:
     - none
     - none
@@ -36,8 +33,6 @@ project:
     - none
     - none
     - none
-
   source_files:
     - tt_um_puf.v
-
-  top_module:   "tt_um_puf"
+  top_module: "tt_um_puf"
