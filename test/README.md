@@ -28,15 +28,15 @@ Applies an 8-bit challenge (`ui_in`) to select two of 16 on-chip ring oscillator
 
 ```bash
 cd test
-make                # RTL sim
-make GATES=yes      # Gate-level sim (requires PDK_ROOT)
+make              # RTL sim
+make GATES=yes    # Gate-level sim (requires PDK_ROOT)
 ```
 
 ## Project structure
 
 ```
 ├── src/
-│   └── tt_um_puf.v       ← entire design, single file
+│   └── project.v         ← entire design, single file
 ├── test/
 │   ├── Makefile
 │   ├── tb.v
