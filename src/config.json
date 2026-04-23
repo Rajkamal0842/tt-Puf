@@ -5,5 +5,9 @@
   "DESIGN_IS_CORE": false,
   "FP_SIZING": "absolute",
   "DIE_AREA": "0 0 161.0 111.52",
-  "QUIT_ON_TIMING_VIOLATIONS": false
+  "QUIT_ON_TIMING_VIOLATIONS": false,
+  "FP_PDN_VOFFSET": 3.1,
+  "FP_PDN_HOFFSET": 3.1,
+  "FP_PDN_VPITCH": 153.8,
+  "FP_PDN_HPITCH": 153.8
 }
