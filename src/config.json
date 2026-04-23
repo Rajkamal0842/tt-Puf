@@ -1,15 +1,7 @@
 {
-    "CLOCK_PORT": "clk",
-    "CLOCK_PERIOD": 20,
-    "PL_TARGET_DENSITY_PCT": 45,
+    "DESIGN_NAME": "tt_um_puf",
     "RT_MAX_LAYER": "met4",
     "MAX_METAL_LAYER": 4,
     "QUIT_ON_TIMING_VIOLATIONS": false,
-    "QUIT_ON_SYNTH_CHECKS": false,
-    "QUIT_ON_MAGIC_DRC": false,
-    "SYNTH_GOLDBEAT_LOOP_IGNORE": true,
-    "SYNTH_BUFFERING": 0,
-    "SYNTH_SIZING": 0,
-    "FP_SIZING": "absolute",
-    "DIE_AREA": "0 0 161.0 111.52"
+    "PL_RANDOM_GLB_PLACEMENT": true
 }
