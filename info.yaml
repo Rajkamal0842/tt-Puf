@@ -1,13 +1,13 @@
 yaml_version: 6
 
 project:
-  title:       "Ring Oscillator PUF"
-  author:      "Rajkamal"
-  description: "Hardware security primitive: 16 ring oscillators compared over a 200-cycle window to produce a 1-bit challenge-response PUF."
-  language:    "Verilog"
-  clock_hz:    50000000
-  tiles:       "1x1"
-  top_module:  "tt_um_puf"
+  title: "PUF Ring Oscillator"
+  author: "Rajkamal"
+  description: "Ring Oscillator Physical Unclonable Function. Two ROs race for 200 cycles; the faster one determines a 1-bit response unique to each die."
+  language: "Verilog"
+  clock_hz: 50000000
+  tiles: "1x1"
+  top_module: "tt_um_puf"
   source_files:
     - tt_um_puf.v
 
@@ -21,7 +21,7 @@ pinout:
   ui[6]: "RO_B select bit 2"
   ui[7]: "RO_B select bit 3"
   uo[0]: "PUF response bit"
-  uo[1]: "Done / result-valid flag"
+  uo[1]: "Done flag"
   uo[2]: "Counter A bit 2 (debug)"
   uo[3]: "Counter A bit 3 (debug)"
   uo[4]: "Counter A bit 4 (debug)"
@@ -40,4 +40,3 @@ pinout:
 tags:
   - security
   - puf
-  - ring-oscillator
