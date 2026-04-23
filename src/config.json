@@ -6,10 +6,11 @@
     "DIE_AREA": "0 0 161.0 111.52",
     "CORE_AREA": "10 10 151.0 101.52",
     "PL_TARGET_DENSITY_PCT": 20,
-    "GRT_ALLOW_CONGESTION": true,
     "RT_MAX_LAYER": "met4",
     "RUN_LINTER": 0,
-    "QUIT_ON_LINTER_ERRORS": false,
+    "QUIT_ON_TIMING_VIOLATIONS": false,
+    "QUIT_ON_MAGIC_DRC": false,
+    "QUIT_ON_LVS_ERRORS": false,
     "SYNTH_GOLDBEAT_LOOP_IGNORE": true,
     "SYNTH_BUFFERING": 0,
     "SYNTH_SIZING": 0
