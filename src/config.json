@@ -3,6 +3,7 @@
     "CLOCK_PERIOD": 20,
     "PL_TARGET_DENSITY_PCT": 45,
     "RT_MAX_LAYER": "met4",
+    "MAX_METAL_LAYER": 4,
     "QUIT_ON_TIMING_VIOLATIONS": false,
     "QUIT_ON_SYNTH_CHECKS": false,
     "QUIT_ON_MAGIC_DRC": false,
