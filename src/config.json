@@ -1,10 +1,6 @@
 {
-    "DESIGN_NAME": "tt_um_puf",
-    "DIE_AREA": "0 0 160.0 100.0",
-    "FP_SIZING": "absolute",
     "DESIGN_IS_CORE": false,
     "FP_PDN_CORE_RING": false,
     "RT_MAX_LAYER": "met4",
-    "QUIT_ON_TIMING_VIOLATIONS": false,
-    "PL_RANDOM_GLB_PLACEMENT": true
+    "QUIT_ON_TIMING_VIOLATIONS": false
 }
