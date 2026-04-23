@@ -1,5 +1,7 @@
 {
     "DESIGN_NAME": "tt_um_puf",
+    "DIE_AREA": "0 0 161.0 111.52",
+    "FP_SIZING": "absolute",
     "RT_MAX_LAYER": "met4",
     "MAX_METAL_LAYER": 4,
     "QUIT_ON_TIMING_VIOLATIONS": false,
