@@ -2,7 +2,7 @@
     "PL_TARGET_DENSITY_PCT": 45,
     "CLOCK_PERIOD": 20,
     "CLOCK_PORT": "clk",
-    "RUN_LINTER": 0,
+    "RUN_LINTER": 1,
     "QUIT_ON_LINTER_ERRORS": false,
     "QUIT_ON_SYNTH_CHECKS": false,
     "QUIT_ON_MAGIC_DRC": false,
