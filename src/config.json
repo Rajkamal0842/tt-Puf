@@ -3,6 +3,8 @@
     "FP_SIZING": "absolute",
     "DESIGN_IS_CORE": false,
     "FP_PDN_CORE_RING": false,
+    "FP_PDN_VOFFSET": 5,
+    "FP_PDN_HOFFSET": 5,
     "RT_MAX_LAYER": "met4",
     "QUIT_ON_TIMING_VIOLATIONS": false
 }
