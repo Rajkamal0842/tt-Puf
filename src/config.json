@@ -1,15 +1,15 @@
 {
-    "PL_TARGET_DENSITY_PCT": 45,
-    "CLOCK_PERIOD": 20,
-    "CLOCK_PORT": "clk",
-    "RUN_LINTER": 1,
-    "QUIT_ON_LINTER_ERRORS": false,
-    "QUIT_ON_SYNTH_CHECKS": false,
-    "QUIT_ON_MAGIC_DRC": false,
-    "QUIT_ON_TIMING_VIOLATIONS": false,
-    "SYNTH_GOLDBEAT_LOOP_IGNORE": true,
-    "SYNTH_BUFFERING": 0,
-    "SYNTH_SIZING": 0,
-    "FP_SIZING": "absolute",
-    "DIE_AREA": "0 0 161.0 111.52"
+  "DESIGN_NAME": "tt_um_puf",
+  "VERILOG_FILES": "dir::src/project.v",
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 20,
+  "DESIGN_IS_CORE": 0,
+  "FP_PDN_VPWR_NET": "VPWR",
+  "FP_PDN_VGND_NET": "VGND",
+  "RUN_LINTER": 1,
+  "PL_RANDOM_GLB_PLACEMENT": 1,
+  "PL_TARGET_DENSITY": 0.65,
+  "FP_CORE_UTIL": 45,
+  "RT_MAX_LAYER": "met4",
+  "ROUTING_CORES": 4
 }
