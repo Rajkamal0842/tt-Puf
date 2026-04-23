@@ -3,13 +3,29 @@ yaml_version: 6
 project:
   title: "PUF Ring Oscillator"
   author: "Rajkamal"
-  description: "Ring Oscillator Physical Unclonable Function. Two ROs race for 200 cycles; the faster one determines a 1-bit response unique to each die."
+  description: "Ring Oscillator Physical Unclonable Function using 16 ROs on sky130."
   language: "Verilog"
   clock_hz: 50000000
   tiles: "1x1"
   top_module: "tt_um_puf"
   source_files:
     - tt_um_puf.v
+
+documentation:
+  how_it_works: |
+    Contains a bank of 16 ring oscillators. An 8-bit challenge selects two
+    ROs via ui_in[3:0] and ui_in[7:4]. Both run for 200 clock cycles while
+    two 8-bit counters track their oscillations. The faster RO produces
+    response bit 1, the slower produces 0. Because oscillator frequencies
+    are determined by silicon manufacturing variation, each die produces a
+    unique response for the same challenge.
+  how_to_test: |
+    1. Clock at 50 MHz. Assert rst_n low then high.
+    2. Set ui_in[3:0] and ui_in[7:4] to select two different ring oscillators.
+    3. Wait ~200 cycles for uo_out[1] (done flag) to go high.
+    4. Read the 1-bit PUF response from uo_out[0].
+    5. Change ui_in to trigger a new evaluation automatically.
+  external_hw: "None required. A Tiny Tapeout demo board with DIP switches and LEDs is sufficient."
 
 pinout:
   ui[0]: "RO_A select bit 0"
@@ -21,7 +37,7 @@ pinout:
   ui[6]: "RO_B select bit 2"
   ui[7]: "RO_B select bit 3"
   uo[0]: "PUF response bit"
-  uo[1]: "Done flag"
+  uo[1]: "Done flag (result valid)"
   uo[2]: "Counter A bit 2 (debug)"
   uo[3]: "Counter A bit 3 (debug)"
   uo[4]: "Counter A bit 4 (debug)"
