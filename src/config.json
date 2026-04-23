@@ -7,8 +7,6 @@
   "FP_PDN_VPWR_NET": "VPWR",
   "FP_PDN_VGND_NET": "VGND",
   "RUN_LINTER": 1,
-  "PL_TARGET_DENSITY": 0.45,
-  "FP_CORE_UTIL": 35,
   "RT_MAX_LAYER": "met4",
   "ROUTING_CORES": 4
 }
