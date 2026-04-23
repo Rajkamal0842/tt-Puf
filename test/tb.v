@@ -1,14 +1,11 @@
 `default_nettype none
 `timescale 1ns / 1ps
-
 module tb ();
-
   initial begin
     $dumpfile("tb.vcd");
     $dumpvars(0, tb);
     #1;
   end
-
   reg        clk;
   reg        rst_n;
   reg        ena;
@@ -17,7 +14,6 @@ module tb ();
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
-
   tt_um_puf dut (
 `ifdef GL_TEST
       .VPWR (1'b1),
@@ -32,5 +28,4 @@ module tb ();
       .clk    (clk),
       .rst_n  (rst_n)
   );
-
 endmodule
