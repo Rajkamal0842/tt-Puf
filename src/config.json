@@ -1,6 +1,6 @@
 {
     "DESIGN_NAME": "tt_um_puf",
-    "DIE_AREA": "0 0 161.0 111.52",
+    "DIE_AREA": "0 0 160.0 100.0",
     "FP_SIZING": "absolute",
     "DESIGN_IS_CORE": false,
     "FP_PDN_CORE_RING": false,
