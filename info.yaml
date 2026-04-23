@@ -1,22 +1,18 @@
 ---
-yaml_version: 6
-
+# Tiny Tapeout project information
 project:
-  title: "Ring Oscillator PUF"
-  author: "Rajkamal0842"
-  discord: ""
-  description: "Ring Oscillator Physical Unclonable Function - selects two of 16 ring oscillators and compares frequencies to produce a unique 1-bit response per die"
-  language: "Verilog"
-  clock_hz: 50000000
+  title:        "Ring Oscillator PUF"
+  author:       "Rajkamal0842"
+  discord:      ""
+  description:  "Ring Oscillator Physical Unclonable Function - compares two ring oscillators to produce a unique 1-bit response per die"
+  language:     "Verilog"
+  clock_hz:     50000000
   tiles: "1x1"
-
+  top_module:  "tt_um_puf"
   source_files:
-    - tt_um_puf.v
-
-  top_module: "tt_um_puf"
+    - "tt_um_puf.v"
 
 pinout:
-  # Inputs
   ui[0]: "RO_A select bit 0"
   ui[1]: "RO_A select bit 1"
   ui[2]: "RO_A select bit 2"
@@ -25,18 +21,14 @@ pinout:
   ui[5]: "RO_B select bit 1"
   ui[6]: "RO_B select bit 2"
   ui[7]: "RO_B select bit 3"
-
-  # Outputs
   uo[0]: "PUF response bit"
   uo[1]: "Done flag"
-  uo[2]: "Counter A bit 2 (debug)"
-  uo[3]: "Counter A bit 3 (debug)"
-  uo[4]: "Counter A bit 4 (debug)"
-  uo[5]: "Counter A bit 5 (debug)"
-  uo[6]: "Counter A bit 6 (debug)"
-  uo[7]: "Counter A bit 7 (debug)"
-
-  # Bidirectional - unused
+  uo[2]: "Counter A bit 2"
+  uo[3]: "Counter A bit 3"
+  uo[4]: "Counter A bit 4"
+  uo[5]: "Counter A bit 5"
+  uo[6]: "Counter A bit 6"
+  uo[7]: "Counter A bit 7"
   uio[0]: ""
   uio[1]: ""
   uio[2]: ""
@@ -45,3 +37,6 @@ pinout:
   uio[5]: ""
   uio[6]: ""
   uio[7]: ""
+
+# Do not change!
+yaml_version: 6
