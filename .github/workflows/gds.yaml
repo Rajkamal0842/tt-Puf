@@ -46,5 +46,4 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - name: View GDS
-        uses: TinyTapeout/tt-gds-action/viewer@ttsky26a
+      - uses: TinyTapeout/tt-gds-action/viewer@ttsky26a
