@@ -41,8 +41,10 @@ jobs:
 
   viewer:
     needs: gds
+    runs-on: ubuntu-24.04
     permissions:
       pages: write
       id-token: write
     steps:
-      - uses: TinyTapeout/tt-gds-action/viewer@ttsky26a
+      - name: View GDS
+        uses: TinyTapeout/tt-gds-action/viewer@ttsky26a
