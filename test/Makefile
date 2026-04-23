@@ -11,7 +11,7 @@ SRC_DIR = $(PWD)/../src
 
 ifneq ($(GATES),yes)
 # RTL simulation
-VERILOG_SOURCES  = $(SRC_DIR)/project.v
+VERILOG_SOURCES  = $(SRC_DIR)/tt_um_puf.v
 VERILOG_SOURCES += $(PWD)/tb.v
 COMPILE_ARGS    += -g2012
 else
