@@ -1,11 +1,14 @@
 {
-  "DESIGN_NAME": "tt_um_puf",
-  "CLOCK_PORT": "clk",
-  "CLOCK_PERIOD": 20,
-  "DESIGN_IS_CORE": 0,
-  "RUN_LINTER": 1,
-  "RT_MAX_LAYER": "met4",
-  "FP_SIZING": "absolute",
-  "DIE_AREA": "0 0 161.0 111.52",
-  "CORE_AREA": "10 10 151.0 101.52"
+    "DESIGN_NAME": "tt_um_puf",
+    "CLOCK_PORT": "clk",
+    "CLOCK_PERIOD": 20,
+    "FP_SIZING": "absolute",
+    "DIE_AREA": "0 0 161.0 111.52",
+    "PL_TARGET_DENSITY_PCT": 45,
+    "RT_MAX_LAYER": "met4",
+    "RUN_LINTER": 0,
+    "QUIT_ON_LINTER_ERRORS": false,
+    "SYNTH_GOLDBEAT_LOOP_IGNORE": true,
+    "SYNTH_BUFFERING": 0,
+    "SYNTH_SIZING": 0
 }
