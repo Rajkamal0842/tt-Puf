@@ -1,12 +1,11 @@
---- 
-# Tiny Tapeout project info
+---
 project:
-  title: "Ring Oscillator PUF"
-  author: "Rajkamal"
-  discord: ""
-  description: "Ring Oscillator Physical Unclonable Function"
-  language: "Verilog"
-  clock_hz: 50000000
+  title:        "Ring Oscillator PUF"
+  author:       "Rajkamal0842"
+  discord:      ""
+  description:  "Ring Oscillator PUF - selects two of 16 ring oscillators and compares frequencies to produce a unique 1-bit response per die"
+  language:     "Verilog"
+  clock_hz:     50000000
 
   inputs:
     - RO_A select bit 0
@@ -21,12 +20,12 @@ project:
   outputs:
     - PUF response bit
     - Done flag
-    - Counter A bit 2
-    - Counter A bit 3
-    - Counter A bit 4
-    - Counter A bit 5
-    - Counter A bit 6
-    - Counter A bit 7
+    - Counter A bit 2 (debug)
+    - Counter A bit 3 (debug)
+    - Counter A bit 4 (debug)
+    - Counter A bit 5 (debug)
+    - Counter A bit 6 (debug)
+    - Counter A bit 7 (debug)
 
   bidirectional:
     - none
@@ -38,8 +37,7 @@ project:
     - none
     - none
 
-# Source files - ONLY list tt_um_puf.v, NOT project.v
   source_files:
     - tt_um_puf.v
 
-  top_module: tt_um_puf
+  top_module:   "tt_um_puf"
