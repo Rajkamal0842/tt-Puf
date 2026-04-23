@@ -11,6 +11,7 @@
     "QUIT_ON_TIMING_VIOLATIONS": false,
     "QUIT_ON_MAGIC_DRC": false,
     "QUIT_ON_LVS_ERRORS": false,
+    "RUN_SPEF_EXTRACTION": false,
     "SYNTH_GOLDBEAT_LOOP_IGNORE": true,
     "SYNTH_BUFFERING": 0,
     "SYNTH_SIZING": 0
