@@ -1,11 +1,14 @@
 `default_nettype none
 `timescale 1ns / 1ps
+
 module tb ();
+
   initial begin
     $dumpfile("tb.vcd");
     $dumpvars(0, tb);
     #1;
   end
+
   reg        clk;
   reg        rst_n;
   reg        ena;
@@ -14,10 +17,17 @@ module tb ();
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
+
+`ifdef GL_TEST
+  // Supply wires for gate-level sim — inout ports need wire not literal
+  wire VPWR = 1'b1;
+  wire VGND = 1'b0;
+`endif
+
   tt_um_puf dut (
 `ifdef GL_TEST
-      .VPWR (1'b1),
-      .VGND (1'b0),
+      .VPWR (VPWR),
+      .VGND (VGND),
 `endif
       .ui_in  (ui_in),
       .uo_out (uo_out),
@@ -28,4 +38,5 @@ module tb ();
       .clk    (clk),
       .rst_n  (rst_n)
   );
+
 endmodule
