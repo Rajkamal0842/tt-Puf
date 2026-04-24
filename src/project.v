@@ -12,21 +12,14 @@ module tt_um_puf (
     input  wire       rst_n
 );
 
-  // ── Bidirectional pins unused ─────────────────────────────────────────────
   assign uio_out = 8'h00;
   assign uio_oe  = 8'h00;
 
-  // ── Challenge select ──────────────────────────────────────────────────────
   wire [2:0] sel = ui_in[2:0];
 
   // =========================================================================
-  // 16 Ring Oscillators (shift-register style, each structurally unique)
-  // Depths 3..18, each with a unique feedback tap so synth cannot merge them.
-  // Each RO is kept alive by (* keep *) and drives a toggle FF.
-  // Total FFs for ROs: sum of depths = 3+4+5+6+7+8+9+10+11+12+7+8+9+10+11+12
-  // = 132 FFs  →  compact but unique
+  // 16 Ring Oscillators — each in ONE always block (reset + shift merged)
   // =========================================================================
-
   (* keep = "true" *) reg [2:0]  ro0;
   (* keep = "true" *) reg [3:0]  ro1;
   (* keep = "true" *) reg [4:0]  ro2;
@@ -44,26 +37,33 @@ module tt_um_puf (
   (* keep = "true" *) reg [10:0] ro14;
   (* keep = "true" *) reg [11:0] ro15;
 
-  always @(posedge clk) begin
-    ro0  <= {ro0 [1:0], ro0 [2]^ro0 [0]};
-    ro1  <= {ro1 [2:0], ro1 [3]^ro1 [1]};
-    ro2  <= {ro2 [3:0], ro2 [4]^ro2 [2]^ro2[0]};
-    ro3  <= {ro3 [4:0], ro3 [5]^ro3 [3]^ro3[1]};
-    ro4  <= {ro4 [5:0], ro4 [6]^ro4 [4]^ro4[2]};
-    ro5  <= {ro5 [6:0], ro5 [7]^ro5 [5]^ro5[3]^ro5[0]};
-    ro6  <= {ro6 [7:0], ro6 [8]^ro6 [6]^ro6[4]^ro6[1]};
-    ro7  <= {ro7 [8:0], ro7 [9]^ro7 [7]^ro7[5]^ro7[2]};
-    ro8  <= {ro8 [9:0], ro8 [10]^ro8[8]^ro8[6]^ro8[3]};
-    ro9  <= {ro9 [10:0],ro9 [11]^ro9[9]^ro9[7]^ro9[4]};
-    ro10 <= {ro10[5:0], ro10[6]^ro10[4]^ro10[2]^ro10[1]};
-    ro11 <= {ro11[6:0], ro11[7]^ro11[5]^ro11[3]^ro11[2]};
-    ro12 <= {ro12[7:0], ro12[8]^ro12[6]^ro12[4]^ro12[3]};
-    ro13 <= {ro13[8:0], ro13[9]^ro13[7]^ro13[5]^ro13[4]};
-    ro14 <= {ro14[9:0], ro14[10]^ro14[8]^ro14[6]^ro14[5]};
-    ro15 <= {ro15[10:0],ro15[11]^ro15[9]^ro15[7]^ro15[6]};
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      ro0  <= 3'h1;   ro1  <= 4'h3;   ro2  <= 5'h05;  ro3  <= 6'h09;
+      ro4  <= 7'h11;  ro5  <= 8'hA5;  ro6  <= 9'h055; ro7  <= 10'h0F3;
+      ro8  <= 11'h155; ro9 <= 12'hA55; ro10 <= 7'h2B;  ro11 <= 8'hD3;
+      ro12 <= 9'h16D; ro13 <= 10'h39C; ro14 <= 11'h5A3; ro15 <= 12'hC9A;
+    end else begin
+      ro0  <= {ro0 [1:0],  ro0 [2]^ro0 [0]};
+      ro1  <= {ro1 [2:0],  ro1 [3]^ro1 [1]};
+      ro2  <= {ro2 [3:0],  ro2 [4]^ro2 [2]^ro2[0]};
+      ro3  <= {ro3 [4:0],  ro3 [5]^ro3 [3]^ro3[1]};
+      ro4  <= {ro4 [5:0],  ro4 [6]^ro4 [4]^ro4[2]};
+      ro5  <= {ro5 [6:0],  ro5 [7]^ro5 [5]^ro5[3]^ro5[0]};
+      ro6  <= {ro6 [7:0],  ro6 [8]^ro6 [6]^ro6[4]^ro6[1]};
+      ro7  <= {ro7 [8:0],  ro7 [9]^ro7 [7]^ro7[5]^ro7[2]};
+      ro8  <= {ro8 [9:0],  ro8 [10]^ro8[8]^ro8[6]^ro8[3]};
+      ro9  <= {ro9 [10:0], ro9 [11]^ro9[9]^ro9[7]^ro9[4]};
+      ro10 <= {ro10[5:0],  ro10[6]^ro10[4]^ro10[2]^ro10[1]};
+      ro11 <= {ro11[6:0],  ro11[7]^ro11[5]^ro11[3]^ro11[2]};
+      ro12 <= {ro12[7:0],  ro12[8]^ro12[6]^ro12[4]^ro12[3]};
+      ro13 <= {ro13[8:0],  ro13[9]^ro13[7]^ro13[5]^ro13[4]};
+      ro14 <= {ro14[9:0],  ro14[10]^ro14[8]^ro14[6]^ro14[5]};
+      ro15 <= {ro15[10:0], ro15[11]^ro15[9]^ro15[7]^ro15[6]};
+    end
   end
 
-  // ── Toggle FFs (one per RO) ───────────────────────────────────────────────
+  // Toggle FFs
   (* keep = "true" *) reg [15:0] tog;
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) tog <= 16'h0000;
@@ -73,38 +73,7 @@ module tt_um_puf (
                        ro3[0], ro2[0], ro1[0], ro0[0]};
   end
 
-  // =========================================================================
-  // Reset logic for ring oscillators — staggered seeds so all differ
-  // =========================================================================
-  always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-      ro0  <= 3'h1;  ro1  <= 4'h3;  ro2  <= 5'h05; ro3  <= 6'h09;
-      ro4  <= 7'h11; ro5  <= 8'hA5; ro6  <= 9'h055;ro7  <= 10'h0F3;
-      ro8  <= 11'h155;ro9 <=12'hA55;ro10 <= 7'h2B; ro11 <= 8'hD3;
-      ro12 <= 9'h16D;ro13<=10'h39C;ro14 <=11'h5A3; ro15 <=12'hC9A;
-    end else begin
-      ro0  <= {ro0 [1:0], ro0 [2]^ro0 [0]};
-      ro1  <= {ro1 [2:0], ro1 [3]^ro1 [1]};
-      ro2  <= {ro2 [3:0], ro2 [4]^ro2 [2]^ro2[0]};
-      ro3  <= {ro3 [4:0], ro3 [5]^ro3 [3]^ro3[1]};
-      ro4  <= {ro4 [5:0], ro4 [6]^ro4 [4]^ro4[2]};
-      ro5  <= {ro5 [6:0], ro5 [7]^ro5 [5]^ro5[3]^ro5[0]};
-      ro6  <= {ro6 [7:0], ro6 [8]^ro6 [6]^ro6[4]^ro6[1]};
-      ro7  <= {ro7 [8:0], ro7 [9]^ro7 [7]^ro7[5]^ro7[2]};
-      ro8  <= {ro8 [9:0], ro8 [10]^ro8[8]^ro8[6]^ro8[3]};
-      ro9  <= {ro9 [10:0],ro9 [11]^ro9[9]^ro9[7]^ro9[4]};
-      ro10 <= {ro10[5:0], ro10[6]^ro10[4]^ro10[2]^ro10[1]};
-      ro11 <= {ro11[6:0], ro11[7]^ro11[5]^ro11[3]^ro11[2]};
-      ro12 <= {ro12[7:0], ro12[8]^ro12[6]^ro12[4]^ro12[3]};
-      ro13 <= {ro13[8:0], ro13[9]^ro13[7]^ro13[5]^ro13[4]};
-      ro14 <= {ro14[9:0], ro14[10]^ro14[8]^ro14[6]^ro14[5]};
-      ro15 <= {ro15[10:0],ro15[11]^ro15[9]^ro15[7]^ro15[6]};
-    end
-  end
-
-  // =========================================================================
-  // FSM + 1023-cycle measurement window
-  // =========================================================================
+  // FSM
   reg [9:0] meas_cnt;
   reg       running, done_r;
 
@@ -127,9 +96,7 @@ module tt_um_puf (
     end
   end
 
-  // =========================================================================
-  // 8 counter pairs (16-bit each) — count tog bits during window
-  // =========================================================================
+  // 8 counter pairs
   reg [15:0] cntA0,cntB0, cntA1,cntB1, cntA2,cntB2, cntA3,cntB3;
   reg [15:0] cntA4,cntB4, cntA5,cntB5, cntA6,cntB6, cntA7,cntB7;
 
@@ -159,7 +126,7 @@ module tt_um_puf (
     end
   end
 
-  // ── PUF response bits (latched at done) ───────────────────────────────────
+  // PUF response bits latched at done
   reg [7:0] puf_bits;
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) puf_bits <= 8'h00;
@@ -175,9 +142,7 @@ module tt_um_puf (
     end
   end
 
-  // =========================================================================
-  // 32-bit Galois LFSR (taps 32,22,2,1)
-  // =========================================================================
+  // 32-bit Galois LFSR
   reg [31:0] lfsr32;
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) lfsr32 <= 32'hDEADBEEF;
@@ -185,9 +150,7 @@ module tt_um_puf (
                    (lfsr32[0] ? 32'h80200003 : 32'h0);
   end
 
-  // =========================================================================
-  // 16-bit LFSR (taps 16,15,13,4)
-  // =========================================================================
+  // 16-bit LFSR
   reg [15:0] lfsr16;
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) lfsr16 <= 16'hACE1;
@@ -195,13 +158,11 @@ module tt_um_puf (
                    (lfsr16[0] ? 16'hB400 : 16'h0);
   end
 
-  // =========================================================================
-  // CRC-32/IEEE-802.3 — one byte per cycle over tog[7:0] ^ lfsr32[7:0]
-  // =========================================================================
+  // CRC-32
   reg [31:0] crc32;
-  wire [7:0]  crc_in = tog[7:0] ^ lfsr32[7:0];
+  wire [7:0] crc_in = tog[7:0] ^ lfsr32[7:0];
 
-  function [31:0] crc32_byte;
+  function automatic [31:0] crc32_byte;
     input [31:0] crc;
     input [7:0]  data;
     reg   [31:0] c;
@@ -219,13 +180,11 @@ module tt_um_puf (
     else        crc32 <= crc32_byte(crc32, crc_in);
   end
 
-  // =========================================================================
-  // CRC-16/CCITT — one byte per cycle over tog[15:8] ^ lfsr16[7:0]
-  // =========================================================================
+  // CRC-16
   reg [15:0] crc16;
-  wire [7:0]  crc16_in = tog[15:8] ^ lfsr16[7:0];
+  wire [7:0] crc16_in = tog[15:8] ^ lfsr16[7:0];
 
-  function [15:0] crc16_byte;
+  function automatic [15:0] crc16_byte;
     input [15:0] crc;
     input [7:0]  data;
     reg   [15:0] c;
@@ -243,9 +202,7 @@ module tt_um_puf (
     else        crc16 <= crc16_byte(crc16, crc16_in);
   end
 
-  // =========================================================================
-  // Hamming-weight popcount of tog[15:0] — 4-level adder tree
-  // =========================================================================
+  // Hamming weight popcount
   wire [1:0] h0 = {1'b0,tog[0]}  + {1'b0,tog[1]};
   wire [1:0] h1 = {1'b0,tog[2]}  + {1'b0,tog[3]};
   wire [1:0] h2 = {1'b0,tog[4]}  + {1'b0,tog[5]};
@@ -262,23 +219,19 @@ module tt_um_puf (
   wire [3:0] hd = {1'b0,ha} + {1'b0,hb};
   wire [4:0] ham1 = {1'b0,hc} + {1'b0,hd};
 
-  // =========================================================================
-  // Two pipeline registers (keep area lean — just 2 × 8 = 16 FFs)
-  // =========================================================================
+  // Pipeline registers
   (* keep = "true" *) reg [7:0] pipe1, pipe2;
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
       pipe1 <= 8'h00;
       pipe2 <= 8'h00;
     end else begin
-      pipe1 <= tog[7:0]   ^ crc32[7:0]  ^ lfsr32[15:8];
-      pipe2 <= tog[15:8]  ^ crc16[7:0]  ^ lfsr16[15:8];
+      pipe1 <= tog[7:0]  ^ crc32[7:0]  ^ lfsr32[15:8];
+      pipe2 <= tog[15:8] ^ crc16[7:0]  ^ lfsr16[15:8];
     end
   end
 
-  // =========================================================================
-  // Mux selected counter pair for debug output
-  // =========================================================================
+  // Mux selected counter pair
   reg [15:0] selA, selB;
   always @(*) begin
     case (sel)
@@ -293,18 +246,9 @@ module tt_um_puf (
     endcase
   end
 
-  // =========================================================================
-  // Debug output byte: XOR of selected counters, pipes, CRC, hamming
-  // =========================================================================
   wire [7:0] debug_out = selA[7:0] ^ selB[7:0] ^ pipe1
-                        ^ crc32[7:0] ^ {3'b0, ham1[4:0]};
+                         ^ crc32[7:0] ^ {3'b0, ham1[4:0]};
 
-  // =========================================================================
-  // Output assignments
-  // uo_out[0] = PUF response (XOR of all 8 puf_bits scrambled)
-  // uo_out[1] = done pulse
-  // uo_out[7:2] = debug_out[7:2]
-  // =========================================================================
   wire puf_response = ^(puf_bits ^ crc32[7:0] ^ lfsr32[7:0]
                         ^ {3'b0, ham1[4:0]} ^ pipe2);
 
