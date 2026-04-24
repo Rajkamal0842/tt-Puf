@@ -1,25 +1,20 @@
 `default_nettype none
-`timescale 1ns/1ps
+`timescale 1ns / 1ps
 
-/* Testbench wrapper for tt_um_puf
-  Ensures power pins are connected for Gate-Level (GL) testing
-*/
-
+/* Testbench for tt_um_puf */
 module tb ();
 
-  // VCD file generation for waveform viewing
   initial begin
-    $dumpfile("tb.vcd");
+    $dumpfile("tb.fst");
     $dumpvars(0, tb);
     #1;
   end
 
-  // Standard signals
-  reg clk;
-  reg rst_n;
-  reg ena;
-  reg [7:0] ui_in;
-  reg [7:0] uio_in;
+  reg        clk;
+  reg        rst_n;
+  reg        ena;
+  reg  [7:0] ui_in;
+  reg  [7:0] uio_in;
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
@@ -29,20 +24,19 @@ module tb ();
   wire VGND = 1'b0;
 `endif
 
-  // Instance of the PUF
   tt_um_puf user_project (
 `ifdef GL_TEST
       .VPWR   (VPWR),
       .VGND   (VGND),
 `endif
-      .ui_in   (ui_in),    // Dedicated inputs
-      .uo_out  (uo_out),   // Dedicated outputs
-      .uio_in  (uio_in),   // IOs: Input path
-      .uio_out (uio_out),  // IOs: Output path
-      .uio_oe  (uio_oe),   // IOs: Enable path
-      .ena     (ena),      // always 1
-      .clk     (clk),      // clock
-      .rst_n   (rst_n)     // reset_n
+      .ui_in  (ui_in),
+      .uo_out (uo_out),
+      .uio_in (uio_in),
+      .uio_out(uio_out),
+      .uio_oe (uio_oe),
+      .ena    (ena),
+      .clk    (clk),
+      .rst_n  (rst_n)
   );
 
 endmodule
