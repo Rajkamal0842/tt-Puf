@@ -24,7 +24,7 @@ async def test_puf_smoke(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value  = 1
     
-    # Wait for the full evaluation window (1000 cycles)
+    # Wait for the full evaluation window (1000 cycles) + margin
     await ClockCycles(dut.clk, 1100)
     dut._log.info(f"SMOKE PASSED — uo_out=0x{int(dut.uo_out.value):02X}")
 
@@ -41,7 +41,7 @@ async def test_puf_done_flag(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value  = 1
     
-    # Updated timeout to 1200 for the 1000-cycle FSM
+    # Updated timeout to 1200 for your 1000-cycle logic
     done = await wait_for_done(dut, timeout_cycles=1200)
     assert done, "Done flag (uo_out[1]) never asserted within 1200 cycles!"
     dut._log.info(f"DONE FLAG PASSED — response={int(dut.uo_out.value) & 1}")
@@ -59,16 +59,16 @@ async def test_puf_multiple_challenges(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value  = 1
     
-    # Check first response
+    # Initial wait after reset
     done = await wait_for_done(dut, timeout_cycles=1200)
-    assert done, "Done flag never asserted after initial reset!"
+    assert done, "Done flag never asserted after reset!"
     
-    # Test a sequence of challenges
+    # Loop through multiple challenges
     for ch in [0x12, 0x57, 0xAB, 0xF0, 0x33]:
         await ClockCycles(dut.clk, 5)
         dut.ui_in.value = ch
         
-        # Each challenge needs 1000 cycles to evaluate
+        # Each challenge needs its own 1000-cycle window
         done = await wait_for_done(dut, timeout_cycles=1200)
         assert done, f"Done flag never asserted for challenge 0x{ch:02X}!"
         
