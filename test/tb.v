@@ -1,36 +1,48 @@
-import cocotb
-from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
+`default_nettype none
+`timescale 1ns/1ps
 
-@cocotb.test()
-async def test_puf_enhanced(dut):
-    dut._log.info("Start Enhanced PUF Test")
-    
-    # Setup clock
-    clock = Clock(dut.clk, 10, units="ns")
-    cocotb.start_soon(clock.start())
+/* Testbench wrapper for tt_um_puf
+  Ensures power pins are connected for Gate-Level (GL) testing
+*/
 
-    # Reset
-    dut._log.info("Resetting...")
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
-    dut.rst_n.value = 1
+module tb ();
 
-    # Test several challenges
-    challenges = [0x00, 0x1F, 0x55, 0xAA, 0xFF]
-    
-    for chal in challenges:
-        dut.ui_in.value = chal
-        dut._log.info(f"Applying Challenge: {hex(chal)}")
-        
-        # Wait for the 1000-cycle evaluation + some margin
-        await ClockCycles(dut.clk, 1100)
-        
-        # Check if done signal is high
-        if dut.uo_out[1].value == 1:
-            res = dut.uo_out[0].value
-            dut._log.info(f"Challenge {hex(chal)} -> Response: {res}")
-        else:
-            dut._log.error(f"PUF failed to complete for challenge {hex(chal)}")
+  // VCD file generation for waveform viewing
+  initial begin
+    $dumpfile("tb.vcd");
+    $dumpvars(0, tb);
+    #1;
+  end
 
-    dut._log.info("Enhanced PUF Test Completed")
+  // Standard signals
+  reg clk;
+  reg rst_n;
+  reg ena;
+  reg [7:0] ui_in;
+  reg [7:0] uio_in;
+  wire [7:0] uo_out;
+  wire [7:0] uio_out;
+  wire [7:0] uio_oe;
+
+`ifdef GL_TEST
+  wire VPWR = 1'b1;
+  wire VGND = 1'b0;
+`endif
+
+  // Instance of the PUF
+  tt_um_puf user_project (
+`ifdef GL_TEST
+      .VPWR   (VPWR),
+      .VGND   (VGND),
+`endif
+      .ui_in   (ui_in),    // Dedicated inputs
+      .uo_out  (uo_out),   // Dedicated outputs
+      .uio_in  (uio_in),   // IOs: Input path
+      .uio_out (uio_out),  // IOs: Output path
+      .uio_oe  (uio_oe),   // IOs: Enable path
+      .ena     (ena),      // always 1
+      .clk     (clk),      // clock
+      .rst_n   (rst_n)     // reset_n
+  );
+
+endmodule
