@@ -1,7 +1,7 @@
 `default_nettype none
 `timescale 1ns / 1ps
 
-/* Testbench for tt_um_puf */
+/* Testbench for tt_um_puf — instantiated by cocotb test.py */
 module tb ();
 
   initial begin
