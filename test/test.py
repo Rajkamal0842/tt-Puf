@@ -5,13 +5,8 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, RisingEdge
 
-@cocotb.test()
-async def test_puf_reset(dut):
-    """Test reset behaviour"""
-    dut._log.info("Start: PUF reset test")
-    clock = Clock(dut.clk, 20, unit="ns")   # 50 MHz
-    cocotb.start_soon(clock.start())
 
+async def reset_dut(dut):
     dut.ena.value    = 1
     dut.ui_in.value  = 0
     dut.uio_in.value = 0
@@ -20,70 +15,72 @@ async def test_puf_reset(dut):
     dut.rst_n.value  = 1
     await ClockCycles(dut.clk, 2)
 
-    # After reset, done should be 0
-    assert dut.uo_out.value[6] == 0, "done should be 0 after reset"
-    dut._log.info("Reset test passed")
 
-
-@cocotb.test()
-async def test_puf_response(dut):
-    """Apply a challenge, wait for done, read response"""
-    dut._log.info("Start: PUF response test")
-    clock = Clock(dut.clk, 20, unit="ns")   # 50 MHz
-    cocotb.start_soon(clock.start())
-
-    dut.ena.value    = 1
-    dut.ui_in.value  = 0
-    dut.uio_in.value = 0
-    dut.rst_n.value  = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value  = 1
-    await ClockCycles(dut.clk, 2)
-
-    # Apply challenge 0x12 (RO_A = 2, RO_B group from upper nibble)
-    dut.ui_in.value = 0x12
-    dut._log.info("Challenge applied: 0x12")
-
-    # Wait up to 1100 cycles for done pulse
-    for _ in range(1100):
+async def wait_done(dut, timeout=1100):
+    for _ in range(timeout):
         await RisingEdge(dut.clk)
-        # uo_out[1] is done flag (bit index 6 in cocotb 8-bit value)
         if (int(dut.uo_out.value) >> 1) & 1:
-            break
-
-    done = (int(dut.uo_out.value) >> 1) & 1
-    assert done == 1, "Done flag never went high!"
-
-    response = int(dut.uo_out.value) & 1
-    dut._log.info(f"PUF response for challenge 0x12: {response}")
-    dut._log.info("Response test passed")
+            return True
+    return False
 
 
 @cocotb.test()
-async def test_puf_two_challenges(dut):
-    """Test that changing challenge triggers a new evaluation"""
-    dut._log.info("Start: Two-challenge test")
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
+async def test_reset(dut):
+    """After reset, done flag must be 0"""
+    dut._log.info("Test: reset")
+    cocotb.start_soon(Clock(dut.clk, 20, unit="ns").start())
+    await reset_dut(dut)
+    assert ((int(dut.uo_out.value) >> 1) & 1) == 0, "done should be 0 after reset"
+    dut._log.info("PASS: reset")
 
-    dut.ena.value    = 1
-    dut.ui_in.value  = 0
-    dut.uio_in.value = 0
-    dut.rst_n.value  = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value  = 1
-    await ClockCycles(dut.clk, 2)
 
-    for challenge in [0x12, 0x34]:
-        dut.ui_in.value = challenge
-        dut._log.info(f"Challenge: {hex(challenge)}")
-        for _ in range(1100):
-            await RisingEdge(dut.clk)
-            if (int(dut.uo_out.value) >> 1) & 1:
-                break
-        done = (int(dut.uo_out.value) >> 1) & 1
-        assert done == 1, f"Done never went high for challenge {hex(challenge)}"
+@cocotb.test()
+async def test_single_challenge(dut):
+    """Apply one challenge, wait for done, read response"""
+    dut._log.info("Test: single challenge 0x12")
+    cocotb.start_soon(Clock(dut.clk, 20, unit="ns").start())
+    await reset_dut(dut)
+
+    dut.ui_in.value = 0x12
+    ok = await wait_done(dut)
+    assert ok, "Timeout: done never went high for challenge 0x12"
+
+    resp = int(dut.uo_out.value) & 1
+    dut._log.info(f"Response for 0x12: {resp}")
+    dut._log.info("PASS: single challenge")
+
+
+@cocotb.test()
+async def test_multiple_challenges(dut):
+    """Cycle through 4 challenges and check done fires each time"""
+    dut._log.info("Test: multiple challenges")
+    cocotb.start_soon(Clock(dut.clk, 20, unit="ns").start())
+    await reset_dut(dut)
+
+    challenges = [0x12, 0x34, 0x56, 0x78]
+    for ch in challenges:
+        dut.ui_in.value = ch
+        ok = await wait_done(dut)
+        assert ok, f"Timeout for challenge {hex(ch)}"
         resp = int(dut.uo_out.value) & 1
-        dut._log.info(f"Response: {resp}")
+        dut._log.info(f"Challenge {hex(ch)} -> response {resp}")
 
-    dut._log.info("Two-challenge test passed")
+    dut._log.info("PASS: multiple challenges")
+
+
+@cocotb.test()
+async def test_same_challenge_no_retrigger(dut):
+    """Same challenge value should NOT retrigger (done stays 0 after first)"""
+    dut._log.info("Test: same challenge no retrigger")
+    cocotb.start_soon(Clock(dut.clk, 20, unit="ns").start())
+    await reset_dut(dut)
+
+    dut.ui_in.value = 0xAB
+    ok = await wait_done(dut)
+    assert ok, "First evaluation never completed"
+
+    # Keep same challenge — done should NOT fire again within 20 cycles
+    await ClockCycles(dut.clk, 20)
+    assert ((int(dut.uo_out.value) >> 1) & 1) == 0, \
+        "done re-fired on same challenge — should not happen"
+    dut._log.info("PASS: same challenge no retrigger")
