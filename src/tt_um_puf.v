@@ -1,23 +1,24 @@
+// Copyright (c) 2024 Your Name
+// SPDX-License-Identifier: Apache-2.0
 `default_nettype none
 
 // Ring Oscillator PUF - Tiny Tapeout (sky130)
-// Enhanced version: 32 ROs, 10-bit counters, 1000-cycle window
-// This gives better PUF entropy and higher chip utilisation
+// 32 ROs, 10-bit counters, 1000-cycle evaluation window
 
 module tt_um_puf (
-    input  wire [7:0] ui_in,
-    output wire [7:0] uo_out,
-    input  wire [7:0] uio_in,
-    output wire [7:0] uio_out,
-    output wire [7:0] uio_oe,
-    input  wire       ena,
-    input  wire       clk,
-    input  wire       rst_n
+    input  wire [7:0] ui_in,    // Dedicated inputs
+    output wire [7:0] uo_out,   // Dedicated outputs
+    input  wire [7:0] uio_in,   // IOs: Input path
+    output wire [7:0] uio_out,  // IOs: Output path
+    output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
+    input  wire       ena,      // always 1 when the design is powered
+    input  wire       clk,      // clock
+    input  wire       rst_n     // reset_n - low to reset
 );
 
-    // lower 5 bits select RO_A (0-31), upper 3 bits select RO_B bank
-    wire [4:0] sel_a = {ui_in[4], ui_in[3:0]};
-    wire [4:0] sel_b = {ui_in[4], ui_in[7:5], 1'b0} + 5'd1;
+    // Challenge selects two ROs to race
+    wire [4:0] sel_a = {1'b0, ui_in[3:0]};
+    wire [4:0] sel_b = {1'b1, ui_in[7:4], 1'b0};
 
     wire ro_en;
 
@@ -72,14 +73,14 @@ module tt_um_puf (
     wire sig_a = ro_bus[sel_a];
     wire sig_b = ro_bus[sel_b];
 
-    // FSM
+    // FSM states
     localparam S_IDLE = 2'd0;
     localparam S_EVAL = 2'd1;
     localparam S_DONE = 2'd2;
 
     reg [1:0]  state;
-    reg [9:0]  eval_cnt;   // 10-bit: counts up to 1000
-    reg [9:0]  counter_a;  // 10-bit counter for more accuracy
+    reg [9:0]  eval_cnt;
+    reg [9:0]  counter_a;
     reg [9:0]  counter_b;
     reg        response;
     reg        done;
@@ -133,7 +134,7 @@ module tt_um_puf (
 
     assign uo_out[0]   = response;
     assign uo_out[1]   = done;
-    assign uo_out[7:2] = counter_a[9:4]; // upper bits of counter for debug
+    assign uo_out[7:2] = counter_a[9:4];
     assign uio_out     = 8'b0;
     assign uio_oe      = 8'b0;
 
