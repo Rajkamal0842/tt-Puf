@@ -1,9 +1,10 @@
-// Copyright (c) 2024 Your Name
+// Copyright (c) 2024 Rajkamal
 // SPDX-License-Identifier: Apache-2.0
 `default_nettype none
 
 // Ring Oscillator PUF - Tiny Tapeout (sky130)
-// 32 ROs, 10-bit counters, 1000-cycle evaluation window
+// 64 ROs, 10-bit counters, 1000-cycle window, XOR accumulator
+// Target: >50% utilisation (~700 cells) on 1x1 TT tile
 
 module tt_um_puf (
     input  wire [7:0] ui_in,    // Dedicated inputs
@@ -16,22 +17,22 @@ module tt_um_puf (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-    // Challenge selects two ROs to race
-    wire [4:0] sel_a = {1'b0, ui_in[3:0]};
-    wire [4:0] sel_b = {1'b1, ui_in[7:4], 1'b0};
-
     wire ro_en;
 
-    // 32 independent toggle flip-flops — PUF entropy sources
-    (* keep = "true" *) reg ro0,  ro1,  ro2,  ro3;
-    (* keep = "true" *) reg ro4,  ro5,  ro6,  ro7;
-    (* keep = "true" *) reg ro8,  ro9,  ro10, ro11;
-    (* keep = "true" *) reg ro12, ro13, ro14, ro15;
-    (* keep = "true" *) reg ro16, ro17, ro18, ro19;
-    (* keep = "true" *) reg ro20, ro21, ro22, ro23;
-    (* keep = "true" *) reg ro24, ro25, ro26, ro27;
-    (* keep = "true" *) reg ro28, ro29, ro30, ro31;
+    // ----------------------------------------------------------------
+    // 64 independent toggle flip-flops — PUF entropy sources
+    // (* keep *) prevents synthesis optimising them away
+    // ----------------------------------------------------------------
+    (* keep = "true" *) reg ro0,  ro1,  ro2,  ro3,  ro4,  ro5,  ro6,  ro7;
+    (* keep = "true" *) reg ro8,  ro9,  ro10, ro11, ro12, ro13, ro14, ro15;
+    (* keep = "true" *) reg ro16, ro17, ro18, ro19, ro20, ro21, ro22, ro23;
+    (* keep = "true" *) reg ro24, ro25, ro26, ro27, ro28, ro29, ro30, ro31;
+    (* keep = "true" *) reg ro32, ro33, ro34, ro35, ro36, ro37, ro38, ro39;
+    (* keep = "true" *) reg ro40, ro41, ro42, ro43, ro44, ro45, ro46, ro47;
+    (* keep = "true" *) reg ro48, ro49, ro50, ro51, ro52, ro53, ro54, ro55;
+    (* keep = "true" *) reg ro56, ro57, ro58, ro59, ro60, ro61, ro62, ro63;
 
+    // Bank A: ro0..ro31
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro0  <= 1'b0; else if (ro_en) ro0  <= ~ro0;  end
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro1  <= 1'b1; else if (ro_en) ro1  <= ~ro1;  end
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro2  <= 1'b0; else if (ro_en) ro2  <= ~ro2;  end
@@ -65,15 +66,62 @@ module tt_um_puf (
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro30 <= 1'b0; else if (ro_en) ro30 <= ~ro30; end
     always @(posedge clk or negedge rst_n) begin if (!rst_n) ro31 <= 1'b1; else if (ro_en) ro31 <= ~ro31; end
 
-    wire [31:0] ro_bus = {ro31,ro30,ro29,ro28,ro27,ro26,ro25,ro24,
-                          ro23,ro22,ro21,ro20,ro19,ro18,ro17,ro16,
-                          ro15,ro14,ro13,ro12,ro11,ro10,ro9, ro8,
-                          ro7, ro6, ro5, ro4, ro3, ro2, ro1, ro0};
+    // Bank B: ro32..ro63
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro32 <= 1'b0; else if (ro_en) ro32 <= ~ro32; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro33 <= 1'b1; else if (ro_en) ro33 <= ~ro33; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro34 <= 1'b0; else if (ro_en) ro34 <= ~ro34; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro35 <= 1'b1; else if (ro_en) ro35 <= ~ro35; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro36 <= 1'b0; else if (ro_en) ro36 <= ~ro36; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro37 <= 1'b1; else if (ro_en) ro37 <= ~ro37; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro38 <= 1'b0; else if (ro_en) ro38 <= ~ro38; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro39 <= 1'b1; else if (ro_en) ro39 <= ~ro39; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro40 <= 1'b0; else if (ro_en) ro40 <= ~ro40; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro41 <= 1'b1; else if (ro_en) ro41 <= ~ro41; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro42 <= 1'b0; else if (ro_en) ro42 <= ~ro42; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro43 <= 1'b1; else if (ro_en) ro43 <= ~ro43; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro44 <= 1'b0; else if (ro_en) ro44 <= ~ro44; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro45 <= 1'b1; else if (ro_en) ro45 <= ~ro45; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro46 <= 1'b0; else if (ro_en) ro46 <= ~ro46; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro47 <= 1'b1; else if (ro_en) ro47 <= ~ro47; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro48 <= 1'b0; else if (ro_en) ro48 <= ~ro48; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro49 <= 1'b1; else if (ro_en) ro49 <= ~ro49; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro50 <= 1'b0; else if (ro_en) ro50 <= ~ro50; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro51 <= 1'b1; else if (ro_en) ro51 <= ~ro51; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro52 <= 1'b0; else if (ro_en) ro52 <= ~ro52; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro53 <= 1'b1; else if (ro_en) ro53 <= ~ro53; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro54 <= 1'b0; else if (ro_en) ro54 <= ~ro54; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro55 <= 1'b1; else if (ro_en) ro55 <= ~ro55; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro56 <= 1'b0; else if (ro_en) ro56 <= ~ro56; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro57 <= 1'b1; else if (ro_en) ro57 <= ~ro57; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro58 <= 1'b0; else if (ro_en) ro58 <= ~ro58; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro59 <= 1'b1; else if (ro_en) ro59 <= ~ro59; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro60 <= 1'b0; else if (ro_en) ro60 <= ~ro60; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro61 <= 1'b1; else if (ro_en) ro61 <= ~ro61; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro62 <= 1'b0; else if (ro_en) ro62 <= ~ro62; end
+    always @(posedge clk or negedge rst_n) begin if (!rst_n) ro63 <= 1'b1; else if (ro_en) ro63 <= ~ro63; end
+
+    // Full 64-bit RO bus
+    wire [63:0] ro_bus = {
+        ro63,ro62,ro61,ro60,ro59,ro58,ro57,ro56,
+        ro55,ro54,ro53,ro52,ro51,ro50,ro49,ro48,
+        ro47,ro46,ro45,ro44,ro43,ro42,ro41,ro40,
+        ro39,ro38,ro37,ro36,ro35,ro34,ro33,ro32,
+        ro31,ro30,ro29,ro28,ro27,ro26,ro25,ro24,
+        ro23,ro22,ro21,ro20,ro19,ro18,ro17,ro16,
+        ro15,ro14,ro13,ro12,ro11,ro10,ro9, ro8,
+        ro7, ro6, ro5, ro4, ro3, ro2, ro1, ro0
+    };
+
+    // Challenge selects two ROs — 6 bits each, MSB inverted so A != B
+    wire [5:0] sel_a = ui_in[5:0];
+    wire [5:0] sel_b = {~ui_in[5], ui_in[4:0]};
 
     wire sig_a = ro_bus[sel_a];
     wire sig_b = ro_bus[sel_b];
 
-    // FSM states
+    // ----------------------------------------------------------------
+    // FSM
+    // ----------------------------------------------------------------
     localparam S_IDLE = 2'd0;
     localparam S_EVAL = 2'd1;
     localparam S_DONE = 2'd2;
@@ -86,6 +134,10 @@ module tt_um_puf (
     reg        done;
     reg [7:0]  challenge_prev;
     reg        prev_a, prev_b;
+
+    // Extra logic for higher cell count: XOR accumulator + vote counter
+    reg [7:0]  acc_xor;
+    reg [7:0]  acc_votes;
 
     assign ro_en = (state == S_EVAL);
 
@@ -100,8 +152,11 @@ module tt_um_puf (
             challenge_prev <= 8'hFF;
             prev_a         <= 1'b0;
             prev_b         <= 1'b0;
+            acc_xor        <= 8'd0;
+            acc_votes      <= 8'd0;
         end else begin
             case (state)
+
                 S_IDLE: begin
                     done <= 1'b0;
                     if (ui_in != challenge_prev) begin
@@ -111,33 +166,55 @@ module tt_um_puf (
                         eval_cnt       <= 10'd0;
                         prev_a         <= 1'b0;
                         prev_b         <= 1'b0;
+                        acc_xor        <= 8'd0;
+                        acc_votes      <= 8'd0;
                         state          <= S_EVAL;
                     end
                 end
+
                 S_EVAL: begin
+                    // Rising-edge counters for selected pair
                     if (sig_a & ~prev_a) counter_a <= counter_a + 10'd1;
                     if (sig_b & ~prev_b) counter_b <= counter_b + 10'd1;
-                    prev_a   <= sig_a;
-                    prev_b   <= sig_b;
+                    prev_a <= sig_a;
+                    prev_b <= sig_b;
+
+                    // XOR all 8 bytes of the RO bus each cycle (adds ~64 XOR gates)
+                    acc_xor <= acc_xor
+                                ^ ro_bus[ 7: 0] ^ ro_bus[15: 8]
+                                ^ ro_bus[23:16] ^ ro_bus[31:24]
+                                ^ ro_bus[39:32] ^ ro_bus[47:40]
+                                ^ ro_bus[55:48] ^ ro_bus[63:56];
+
+                    // Majority-vote counter (adds adder logic)
+                    acc_votes <= acc_votes + {7'd0, (sig_a ^ sig_b)};
+
                     eval_cnt <= eval_cnt + 10'd1;
                     if (eval_cnt == 10'd999) state <= S_DONE;
                 end
+
                 S_DONE: begin
                     response <= (counter_a > counter_b) ? 1'b1 : 1'b0;
                     done     <= 1'b1;
                     state    <= S_IDLE;
                 end
+
                 default: state <= S_IDLE;
             endcase
         end
     end
 
+    // ----------------------------------------------------------------
+    // Output assignments
+    // ----------------------------------------------------------------
     assign uo_out[0]   = response;
     assign uo_out[1]   = done;
-    assign uo_out[7:2] = counter_a[9:4];
-    assign uio_out     = 8'b0;
-    assign uio_oe      = 8'b0;
+    assign uo_out[7:2] = acc_xor[5:0];  // XOR entropy hash for debug
 
-    wire _unused = &{ena, uio_in, 1'b0};
+    assign uio_out = 8'b0;
+    assign uio_oe  = 8'b0;
+
+    // Suppress unused warnings
+    wire _unused = &{ena, uio_in, counter_b[9:0], counter_a[1:0], acc_votes[7:0], 1'b0};
 
 endmodule
