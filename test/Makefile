@@ -9,18 +9,11 @@ COCOTB_HDL_TIMEPRECISION = 1ps
 SRC_DIR = $(PWD)/../src
 
 ifneq ($(GATES),yes)
-# RTL simulation
 VERILOG_SOURCES  = $(SRC_DIR)/project.v
 VERILOG_SOURCES += $(PWD)/tb.v
 COMPILE_ARGS    += -g2012
 else
-# Gate-level simulation
-COMPILE_ARGS += -g2012
-COMPILE_ARGS += -DGL_TEST
-COMPILE_ARGS += -DFUNCTIONAL
-COMPILE_ARGS += -DSIM
-COMPILE_ARGS += -DUNIT_DELAY=\#1
-COMPILE_ARGS += -DUSE_POWER_PINS
+COMPILE_ARGS += -g2012 -DGL_TEST -DFUNCTIONAL -DSIM -DUNIT_DELAY=\#1 -DUSE_POWER_PINS
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
 VERILOG_SOURCES += gate_level_netlist.v
