@@ -1,8 +1,6 @@
 `default_nettype none
 `timescale 1ns / 1ps
-
 module tb ();
-
   initial begin
     $dumpfile("tb.fst");
     $dumpvars(0, tb);
@@ -25,8 +23,8 @@ module tb ();
 
   tt_um_puf user_project (
 `ifdef GL_TEST
-      .VPWR   (VPWR),
-      .VGND   (VGND),
+      .VPWR(VPWR),
+      .VGND(VGND),
 `endif
       .ui_in  (ui_in),
       .uo_out (uo_out),
