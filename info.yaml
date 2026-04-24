@@ -1,10 +1,9 @@
----
 # Tiny Tapeout project information
 project:
   title:        "Ring Oscillator PUF"
-  author:       "Rajkamal0842"
+  author:       "Rajkamal"
   discord:      ""
-  description:  "32-RO PUF with CRC-32, CRC-16, dual LFSR, dual Hamming-weight trees and 8x16-bit counter pairs targeting >70% tile utilisation"
+  description:  "16-RO PUF with CRC32 accumulator and LFSR scrambler. Outputs 8-bit challenge-response for hardware authentication."
   language:     "Verilog"
   clock_hz:     50000000
   tiles: "1x1"
@@ -13,22 +12,25 @@ project:
     - "project.v"
 
 pinout:
-  ui[0]: "Challenge bit 0 (selects counter pair 0-7 for debug output)"
-  ui[1]: "Challenge bit 1"
-  ui[2]: "Challenge bit 2"
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: ""
-  uo[0]: "PUF response bit (CRC-32 + LFSR scrambled)"
-  uo[1]: "Measurement done flag (pulses high for 1 cycle)"
-  uo[2]: "Debug scrambled counter bit 2"
-  uo[3]: "Debug scrambled counter bit 3"
-  uo[4]: "Debug scrambled counter bit 4"
-  uo[5]: "Debug scrambled counter bit 5"
-  uo[6]: "Debug scrambled counter bit 6"
-  uo[7]: "Debug scrambled counter bit 7"
+  # Inputs
+  ui[0]: "Challenge bit 0 (RO_A select LSB)"
+  ui[1]: "Challenge bit 1 (RO_A select)"
+  ui[2]: "Challenge bit 2 (RO_A select)"
+  ui[3]: "Challenge bit 3 (RO_A select MSB)"
+  ui[4]: "Challenge bit 4 (RO_B select LSB)"
+  ui[5]: "Challenge bit 5 (RO_B select)"
+  ui[6]: "Challenge bit 6 (RO_B select)"
+  ui[7]: "Challenge bit 7 (RO_B select MSB)"
+  # Outputs
+  uo[0]: "PUF response bit (challenge-selected pair)"
+  uo[1]: "Done flag (pulses high when result ready)"
+  uo[2]: "Fixed pair 0 response XOR LFSR"
+  uo[3]: "Fixed pair 1 response XOR LFSR"
+  uo[4]: "Fixed pair 2 response XOR LFSR"
+  uo[5]: "Fixed pair 3 response XOR LFSR"
+  uo[6]: "CRC32 entropy bit 0"
+  uo[7]: "CRC32 entropy bit 1"
+  # Bidirectional (unused)
   uio[0]: ""
   uio[1]: ""
   uio[2]: ""
