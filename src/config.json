@@ -8,7 +8,7 @@
   "//": "Here are some of the variables you may want to change:",
   "//": "PL_TARGET_DENSITY_PCT - You can increase this if Global Placement fails with error GPL-0302.",
   "//": "Users have reported that values up to 80 worked well for them.",
-  "PL_TARGET_DENSITY_PCT": 60,
+  "PL_TARGET_DENSITY_PCT": 45,
   "//": "CLOCK_PERIOD - Increase this in case you are getting setup time violations.",
   "//": "The value is in nanoseconds, so 20ns == 50MHz.",
   "CLOCK_PERIOD": 20,
@@ -48,5 +48,9 @@
   "//": "MAGIC_DEF_LABELS may cause issues with LVS",
   "MAGIC_DEF_LABELS": 0,
   "//": "Only export pin area in LEF (without any connected nets)",
-  "MAGIC_WRITE_LEF_PINONLY": 1
+  "MAGIC_WRITE_LEF_PINONLY": 1,
+  "//": "PUF Specific Settings to prevent flow crashes",
+  "SYNTH_GOLDBEAT_LOOP_IGNORE": true,
+  "QUIT_ON_TIMING_VIOLATIONS": false,
+  "RUN_SPEF_EXTRACTION": false
 }
