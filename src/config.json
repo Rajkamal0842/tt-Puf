@@ -52,5 +52,6 @@
   "//": "PUF Specific Settings to prevent flow crashes",
   "SYNTH_GOLDBEAT_LOOP_IGNORE": true,
   "QUIT_ON_TIMING_VIOLATIONS": false,
-  "RUN_SPEF_EXTRACTION": false
+  "RUN_SPEF_EXTRACTION": false,
+  "RUN_POST_PNR_STA": false
 }
