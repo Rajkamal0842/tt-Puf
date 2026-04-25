@@ -1,33 +1,21 @@
-<!---
-This file is used to generate your project datasheet. Please fill in the information below and delete any unused
-sections.
-You can also include images in this folder and reference them in the markdown. Each image must be less than
-512 kb in size, and the combined size of all images must be less than 1 MB.
--->
-
 ## How it works
 
-This project implements a **Ring Oscillator Physical Unclonable Function (RO-PUF)** — a hardware security primitive that generates a unique, chip-specific fingerprint from unavoidable transistor-level manufacturing variation in silicon.
+This project implements a **Ring Oscillator Physical Unclonable Function (RO-PUF)** on the sky130 process node.
 
-The design contains **16 ring oscillators** modelled as multi-bit LFSRs, each with a unique width, unique tap polynomial, and unique reset value. Their LSB outputs are accumulated into a 16-bit toggle register each clock cycle. The resulting toggle patterns depend on the exact transistor characteristics at the time of manufacture, making each chip produce a different sequence.
+A 32-bit LFSR (Linear Feedback Shift Register) with taps at positions 32, 22, 2, and 1 runs continuously. Its outputs feed 16 toggle flip-flops, each driven by a unique combination of LFSR tap XOR values. Because each toggle FF sees a structurally different Boolean function of the LFSR, the synthesiser cannot merge them — they behave like independent oscillators whose frequencies are set by silicon manufacturing variation.
 
-When the device comes out of reset, it automatically starts a **1000-cycle measurement window**. During this window, **four hardwired 12-bit counter pairs** each race two fixed ROs simultaneously, and a **challenge-selected pair** races the two ROs chosen by `ui_in`. At the end of 1000 cycles, each counter pair's comparator result provides one PUF response bit.
-
-Two LFSRs — a 32-bit and a 16-bit — run in parallel every cycle and XOR their bits into the final output to add entropy depth and make the response harder to predict without silicon.
-
-After each evaluation completes (`done` goes high), the FSM automatically restarts a new 1000-cycle window. To use a different challenge, assert `rst_n` low briefly then release — this resets the FSM and starts fresh with the current `ui_in`.
+Eight 12-bit counter pairs accumulate the toggle values of adjacent FF pairs over a fixed 1000-cycle window. A three-state FSM (IDLE → RUN → DONE) manages the measurement cycle cleanly, ensuring the done pulse fires for exactly one clock cycle with no restart race. After each window, counters in each pair are compared; the PUF response bit is the XOR of all eight comparison results, scrambled by the LFSR and a running 8-bit CRC.
 
 ## How to test
 
-1. Connect a 50 MHz clock to `clk`.
-2. Set `ui_in` to your desired 8-bit challenge value.
-3. Assert `rst_n` low for at least 5 clock cycles, then release high.
-4. Wait approximately **1002 clock cycles** (~20 µs at 50 MHz) for `uo_out[1]` (done) to go high.
-5. Read the full 8-bit response from `uo_out[7:0]`.
-6. To test a new challenge: apply `rst_n` low/high again with the new `ui_in` value.
-
-The same challenge on the same chip always produces the same response. Different chips produce statistically independent responses for the same challenge (~50% Hamming distance between chips).
+1. Set clock to 50 MHz.
+2. Assert `rst_n` low for at least 5 cycles, then release high.
+3. The FSM starts automatically. Wait for `uo_out[1]` to pulse HIGH (exactly 1 clock cycle). This takes approximately 1002 cycles (~20 µs at 50 MHz).
+4. Read the PUF response from `uo_out[0]` on the same cycle that `uo_out[1]` is HIGH.
+5. The FSM restarts immediately — `uo_out[1]` will pulse again after another ~1002 cycles.
+6. `uo_out[7:2]` outputs scrambled counter MSBs for debug/characterisation.
+7. To re-seed the LFSR with a different sequence, pulse `rst_n` low and release.
 
 ## External hardware
 
-No external hardware required. A microcontroller or logic analyser connected to `ui_in` and `uo_out` is sufficient for reading and recording challenge-response pairs.
+None required.
