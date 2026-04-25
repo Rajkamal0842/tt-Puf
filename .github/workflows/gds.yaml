@@ -1,18 +1,54 @@
-# BEFORE (missing environment - causes error):
+name: gds
+
+on:
+  push:
+  workflow_dispatch:
+
 jobs:
-  viewer:
+  gds:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/deploy-pages@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Run GDS action
+        uses: TinyTapeout/tt-gds-action@ttsky26a
 
-# AFTER (correct - add these 3 lines):
-jobs:
+  precheck:
+    needs: gds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run precheck
+        uses: TinyTapeout/tt-gds-action/precheck@ttsky26a
+
+  gl_test:
+    needs: gds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Run GL test
+        uses: TinyTapeout/tt-gds-action/gl_test@ttsky26a
+
   viewer:
+    needs: gds
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run viewer
+        uses: TinyTapeout/tt-gds-action/viewer@ttsky26a
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
