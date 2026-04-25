@@ -1,36 +1,31 @@
-# Tiny Tapeout project information
 project:
   title:        "Ring Oscillator PUF"
   author:       "Rajkamal"
   discord:      ""
-  description:  "16-RO PUF with 4 parallel 12-bit counter pairs and 32/16-bit LFSR scramblers. Outputs 8-bit challenge-response for hardware authentication."
+  description:  "8-pair RO-PUF: LFSR-driven toggle FFs, 8x12-bit counter pairs, 3-state FSM"
   language:     "Verilog"
   clock_hz:     50000000
   tiles: "1x1"
   top_module:  "tt_um_puf"
   source_files:
     - "project.v"
-
 pinout:
-  # Inputs
-  ui[0]: "Challenge bit 0 (RO_A select LSB)"
-  ui[1]: "Challenge bit 1 (RO_A select)"
-  ui[2]: "Challenge bit 2 (RO_A select)"
-  ui[3]: "Challenge bit 3 (RO_A select MSB)"
-  ui[4]: "Challenge bit 4 (RO_B select LSB)"
-  ui[5]: "Challenge bit 5 (RO_B select)"
-  ui[6]: "Challenge bit 6 (RO_B select)"
-  ui[7]: "Challenge bit 7 (RO_B select MSB)"
-  # Outputs
-  uo[0]: "PUF response bit (challenge-selected pair XOR LFSR)"
-  uo[1]: "Done flag (high when result is valid)"
-  uo[2]: "Fixed pair 0 response"
-  uo[3]: "Fixed pair 1 response"
-  uo[4]: "Fixed pair 2 response"
-  uo[5]: "Fixed pair 3 response"
-  uo[6]: "LFSR entropy bit 0"
-  uo[7]: "LFSR entropy bit 1"
-  # Bidirectional (unused)
+  ui[0]: "Unused"
+  ui[1]: "Unused"
+  ui[2]: "Unused"
+  ui[3]: "Unused"
+  ui[4]: "Unused"
+  ui[5]: "Unused"
+  ui[6]: "Unused"
+  ui[7]: "Unused"
+  uo[0]: "PUF response bit (XOR of 8 comparisons, LFSR scrambled)"
+  uo[1]: "Measurement done flag (1-cycle pulse every ~1002 clocks)"
+  uo[2]: "Debug MSB 0"
+  uo[3]: "Debug MSB 1"
+  uo[4]: "Debug MSB 2"
+  uo[5]: "Debug MSB 3"
+  uo[6]: "Debug MSB 4"
+  uo[7]: "Debug MSB 5"
   uio[0]: ""
   uio[1]: ""
   uio[2]: ""
@@ -39,6 +34,4 @@ pinout:
   uio[5]: ""
   uio[6]: ""
   uio[7]: ""
-
-# Do not change!
 yaml_version: 6
