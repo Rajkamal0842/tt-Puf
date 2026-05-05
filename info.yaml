@@ -1,5 +1,5 @@
 project:
-  title:        "Ring Oscillator PUF"
+  title:        "IEEE Ring Oscillator PUF"
   author:       "Rajkamal"
   discord:      ""
   description:  "8-pair RO-PUF: LFSR-driven toggle FFs, 8x12-bit counter pairs, 3-state FSM"
